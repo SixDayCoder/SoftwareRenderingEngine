@@ -1,0 +1,9 @@
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.csprojResolveAssemblyReference.cache
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.MainWindow.resources
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.Properties.Resources.resources
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.csproj.GenerateResource.Cache
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\bin\Debug\SoftwareRenderingEngine.exe.config
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\bin\Debug\SoftwareRenderingEngine.exe
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\bin\Debug\SoftwareRenderingEngine.pdb
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.exe
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.pdb
