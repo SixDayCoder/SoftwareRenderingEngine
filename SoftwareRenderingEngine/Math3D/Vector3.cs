@@ -27,7 +27,10 @@ namespace SoftwareRenderingEngine.Math3D {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.w = 0;
+            this.w = 1;
+        }
+
+        public Vector3() {
         }
 
         public float Length {
@@ -157,6 +160,12 @@ namespace SoftwareRenderingEngine.Math3D {
             float z = lhs.x * rhs.y - lhs.y * rhs.x;
             return new Vector3(x, y, z, 0);
         }
+
+        public static float Distance(Vector3 lhs, Vector3 rhs) {
+            Vector3 to = lhs - rhs;
+            return to.Length;
+        }
+
 
         #endregion
 

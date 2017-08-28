@@ -35,5 +35,13 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
+        public static void Swap<T>(ref T lhs, ref T rhs) {
+
+            T tmp = lhs;
+            lhs = rhs;
+            rhs = tmp;
+
+        }
+
     }
 }
