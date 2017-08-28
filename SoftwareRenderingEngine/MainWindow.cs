@@ -19,11 +19,22 @@ namespace SoftwareRenderingEngine {
     /// 1.Graphics canvas      -->   Graphics封装了GDI,用于进行图形的绘制
     /// 2.Bitmap   buffer      -->   自定义的缓冲,渲染管线的每个像素的结果保存在这里
     /// </summary>
+    
     public partial class MainWindow : Form {
 
         private Graphics canvas = null;
 
         private Bitmap buffer = null;
+
+        #region 开启计时器,设定FPS为60,每帧调用Update,在Update中进行渲染
+        private void SetupTimer() {
+            System.Timers.Timer timer = new System.Timers.Timer(1000 / 60f);
+            timer.Elapsed += new ElapsedEventHandler(Update);
+            timer.AutoReset = true;
+            timer.Enabled = true;
+            timer.Start();
+        }
+        #endregion
 
         public MainWindow() {
 
@@ -34,7 +45,6 @@ namespace SoftwareRenderingEngine {
 
             //当前窗口创建graphics
             canvas = this.CreateGraphics();
-
 
             //开启计时器
             SetupTimer();
@@ -52,26 +62,29 @@ namespace SoftwareRenderingEngine {
 
         }
 
-        //开启计时器,设定FPS为60,每帧调用Update,在Update中进行渲染
-        private void SetupTimer() {
-            System.Timers.Timer timer = new System.Timers.Timer(1000 / 60f);
-            timer.Elapsed += new ElapsedEventHandler(Update);
-            timer.AutoReset = true;
-            timer.Enabled = true;
-            timer.Start();
-        }
+
 
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         private void Update(object sender, EventArgs e) {
 
             lock (buffer) {
-                //ClearBuffer();
+                ClearBuffer();
+                BresenhamDrawLine(5, 5, 500, 5);
                 BresenhamDrawLine(5, 5, 5, 500);
+                BresenhamDrawLine(0, 0, 200, 100);
+                BresenhamDrawLine(0, 0, 100, 200);
+                
                 canvas.DrawImage(buffer, 0, 0);
             }
 
         }
 
+
+        //该函数保证lhs<rhs
+        private void LhsLowerThanRhs(ref int lhs, ref int rhs) {
+            if (lhs > rhs)
+                swap(ref lhs, ref rhs);
+        }
 
         private void swap<T>(ref T lhs, ref T rhs) {
             T temp = lhs;
@@ -81,22 +94,19 @@ namespace SoftwareRenderingEngine {
 
         private void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
 
-            if (x1 > x2)
-                swap(ref x1, ref x2);
-
+            LhsLowerThanRhs(ref x1, ref x2);
             for (int x = x1; x <= x2; ++x)
                 buffer.SetPixel(x, y1, Color.Red);
         }
 
         private void DrawVerticalLine(int x1, int y1, int x2, int y2) {
 
-            if (y1 > y2)
-                swap(ref y1, ref y2);
-
+            LhsLowerThanRhs(ref y1, ref y2);
             for (int y = y1; y <= y2; ++y)
                 buffer.SetPixel(x1, y, Color.Red);
 
         }
+
         void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
 
             //处理两种特殊的情况
@@ -109,6 +119,7 @@ namespace SoftwareRenderingEngine {
                 DrawVerticalLine(x1, y1, x2, y2);
             }
             else {
+
                 //根据斜率的正负判断步进是增还是减 
                 int stepy = (y2 > y1) ? 1 : -1;
                 int stepx = (x2 > x1) ? 1 : -1;
@@ -122,12 +133,11 @@ namespace SoftwareRenderingEngine {
 
                 //斜率>1,说明y变化较快,为了不让画出点稀疏,让y步进,计算x的值
                 if (gradient) {
-                    int x = x1;
+
+                    int x = Math.Min(x1, x2);
+                    LhsLowerThanRhs(ref y1, ref y2);
                     error = -dy;
-                    if (y1 > y2) {//y1必须小于y2
-                        swap(ref y1, ref y2);
-                        x = x2;
-                    }
+
                     for (int y = y1; y <= y2; ++y) {
 
                         buffer.SetPixel(x, y, Color.Red);
@@ -137,16 +147,16 @@ namespace SoftwareRenderingEngine {
                             error = error - dy - dy;
                             x += stepx;
                         }
+
                     }
                 }
                 //斜率<1,说明x变换较快,为了不让画出的点稀疏,让x步进,计算y的值
                 else {
-                    int y = y1;
+
+                    int y = Math.Min(y1, y2);
+                    LhsLowerThanRhs(ref x1, ref x2);
                     error = -dx;
-                    if (x1 > x2) {//x1必须小于x2
-                        swap(ref x1, ref x2);
-                        y = y2;
-                    }
+
                     for (int x = x1; x <= x2; ++x) {
 
                         buffer.SetPixel(x, y, Color.Red);
@@ -156,7 +166,7 @@ namespace SoftwareRenderingEngine {
                             error = error - dx - dx;
                             y += stepy;
                         }
-                        x += 1;
+
                     }
                 }
             }
