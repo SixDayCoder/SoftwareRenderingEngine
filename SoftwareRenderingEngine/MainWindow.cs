@@ -62,8 +62,6 @@ namespace SoftwareRenderingEngine {
 
         }
 
-
-
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         private void Update(object sender, EventArgs e) {
 

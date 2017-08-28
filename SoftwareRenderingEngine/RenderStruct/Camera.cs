@@ -13,7 +13,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
         //摄像机在世界空间下的坐标
         public Vector3 pos;
         
-        //观察目标点
+        //观察目标点 
         public Vector3 target;
 
         //自定义的竖直方向,这里取(0,0,1)
