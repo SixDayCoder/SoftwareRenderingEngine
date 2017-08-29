@@ -43,5 +43,17 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
+
+        //该函数保证Lhs<rhs
+        public static void LhsLowerThanRhs(ref int lhs, ref int rhs) {
+            if (lhs > rhs)
+                Swap(ref lhs, ref rhs);
+        }
+
+        public static void LhsLowerThanRhs(ref float lhs, ref float rhs) {
+            if (lhs > rhs)
+                Swap(ref lhs, ref rhs);
+        }
+
     }
 }

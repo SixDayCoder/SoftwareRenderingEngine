@@ -7,7 +7,7 @@ using SoftwareRenderingEngine.RenderStruct;
 
 namespace SoftwareRenderingEngine.Math3D {
 
-    class Matrix4X4 {
+    public class Matrix4X4 {
 
         #region 构造方法
 

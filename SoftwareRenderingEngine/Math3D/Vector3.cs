@@ -8,7 +8,7 @@ using SoftwareRenderingEngine.Utility;
 
 namespace SoftwareRenderingEngine.Math3D {
 
-    class Vector3 {
+    public class Vector3 {
 
         public float x;
         public float y;

@@ -7,18 +7,20 @@ using SoftwareRenderingEngine.Math3D;
 
 namespace SoftwareRenderingEngine.RenderStruct {
 
-    class Transform {
+    public class Transform {
 
-        public static Matrix4X4 model;
+        public Matrix4X4 model;
 
-        public static Matrix4X4 view;
+        public Matrix4X4 view;
 
-        public static Matrix4X4 projection;
+        public Matrix4X4 projection;
 
-        public static Matrix4X4 MVP {
+        public Matrix4X4 MVP {
+
             get {
                 return model * view * projection;
             }
+
         }
 
 

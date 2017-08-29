@@ -8,7 +8,7 @@ using SoftwareRenderingEngine.Math3D;
 namespace SoftwareRenderingEngine.RenderStruct {
 
     //UVN模型的摄像机
-    class Camera {
+    public class Camera {
 
         //摄像机在世界空间下的坐标
         public Vector3 pos;

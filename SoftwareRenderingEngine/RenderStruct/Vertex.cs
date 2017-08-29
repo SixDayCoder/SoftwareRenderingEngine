@@ -8,7 +8,7 @@ using SoftwareRenderingEngine.Math3D;
 
 namespace SoftwareRenderingEngine.RenderStruct {
 
-    class Vertex {
+    public class Vertex {
 
         //顶点坐标
         public Vector3 position;
@@ -21,6 +21,13 @@ namespace SoftwareRenderingEngine.RenderStruct {
 
         //顶点颜色
         public Color color;
+
+        public Vertex() {
+            position = new Vector3();
+            normal = new Vector3();
+            u = v = 0;
+            color = new Color();
+        }
 
     }
 }

@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Timers;
 
+using SoftwareRenderingEngine.Math3D;
+using SoftwareRenderingEngine.RenderStruct;
+using SoftwareRenderingEngine.Utility;
+
 namespace SoftwareRenderingEngine {
 
 
@@ -18,17 +22,22 @@ namespace SoftwareRenderingEngine {
     /// 窗体包含两个重要的属性
     /// 1.Graphics canvas      -->   Graphics封装了GDI,用于进行图形的绘制
     /// 2.Bitmap   buffer      -->   自定义的缓冲,渲染管线的每个像素的结果保存在这里
+    /// 3.float[,] zbuffer     -->   深度缓冲
     /// </summary>
-    
+
     public partial class MainWindow : Form {
 
         private Graphics canvas = null;
 
         private Bitmap buffer = null;
 
+        private float[,] zbuffer = null;
+
+        private List<Mesh> meshs = null;
+
         #region 开启计时器,设定FPS为60,每帧调用Update,在Update中进行渲染
         private void SetupTimer() {
-            System.Timers.Timer timer = new System.Timers.Timer(1000 / 60f);
+            System.Timers.Timer timer = new System.Timers.Timer( 1000 / 60 );
             timer.Elapsed += new ElapsedEventHandler(Update);
             timer.AutoReset = true;
             timer.Enabled = true;
@@ -36,139 +45,143 @@ namespace SoftwareRenderingEngine {
         }
         #endregion
 
+        #region  测试mesh,待删除
+
+        private void LoadMesh() {
+
+            Vertex v1 = new Vertex();
+            v1.position = new Vector3(5, 5, 0);
+
+            Vertex v2 = new Vertex();
+            v2.position = new Vector3(255, 5, 0);
+
+            Vertex v3 = new Vertex();
+            v3.position = new Vector3(5, 255, 0);
+
+            Vertex v4 = new Vertex();
+            v4.position = new Vector3(255, 255, 0);
+
+            Mesh mesh  = new Mesh();
+
+            mesh.vertices = new Vertex[] { v1, v2, v3, v4 };
+            mesh.indices = new int[,] { { 0, 1, 2 }, { 1, 2, 3 } };
+
+            meshs.Add(mesh);
+
+        }
+
+        #endregion
+
+
         public MainWindow() {
 
             InitializeComponent();
 
-            //当前窗口的宽高值
-            buffer = new Bitmap(this.Width, this.Height);
-
             //当前窗口创建graphics
             canvas = this.CreateGraphics();
 
+            //当前窗口的宽高值
+            buffer = new Bitmap(this.Width, this.Height);
+
+            //根据buffer的大小设定zbuffer
+            zbuffer = new float[this.Width, this.Height];
+
+            //meshs,要渲染的网格列表
+            meshs = new List<Mesh>();
+
             //开启计时器
             SetupTimer();
+
+            //加载模型
+            LoadMesh();
+        }
+
+        //根据键盘的输入调整摄像机等,确定各个变换矩阵
+        private void UpdateTransform() {
+
         }
 
 
         //清空缓存 
         private void ClearBuffer() {
 
+            //清空缓存
             for (int x = 0; x < buffer.Width; ++x) {
                 for (int y = 0; y < buffer.Height; ++y) {
                     buffer.SetPixel(x, y, Color.Black);
                 }
             }
 
+            //清空zbuffer
+            Array.Clear(zbuffer, 0, zbuffer.Length);
+
+            //清除整个绘图面并以黑色填充
+            //canvas.Clear(Color.Black);
         }
+
+        //渲染Mesh网格
+        private void RenderMesh() {
+
+            int rows = 0;
+            int index1 = 0, index2 = 0, index3 = 0;
+
+            foreach(Mesh mesh in meshs) {
+
+                rows = mesh.indices.GetLength(0);
+
+                for(int i = 0; i < rows; ++i) {
+
+                    index1 = mesh.indices[i, 0];
+                    index2 = mesh.indices[i, 1];
+                    index3 = mesh.indices[i, 2];
+
+                    Triangle triangle = new Triangle(mesh.vertices[index1], mesh.vertices[index2], mesh.vertices[index3]);
+
+                    Point2 p1 = new Point2(triangle.top.position);
+                    Point2 p2 = new Point2(triangle.middle.position);
+                    Point2 p3 = new Point2(triangle.bottom.position);
+
+                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
+                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p2.x, (int)p2.y, (int)p3.x, (int)p3.y);
+                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p3.x, (int)p3.y);
+
+                }
+            }
+        
+        }
+
 
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         private void Update(object sender, EventArgs e) {
 
+            /*
+             lock(object){
+                code
+             } 
+             看似简单，实际上有三个意思，这对于适当地使用它至关重要：
+             1. object被lock了吗？没有则由我来lock，否则一直等待，直至object被释放。
+             2. lock以后在执行code的期间其他线程不能调用code，也不能使用object。
+             3. 执行完codeB之后释放object，并且code可以被其他线程访问。
+            */
+
             lock (buffer) {
-                ClearBuffer();
-                BresenhamDrawLine(5, 5, 500, 5);
-                BresenhamDrawLine(5, 5, 5, 500);
-                BresenhamDrawLine(0, 0, 200, 100);
-                BresenhamDrawLine(0, 0, 100, 200);
+
+                //1.根据输入更新变换矩阵  UpdateTransform()
+                //2.清除缓存             ClearBuffer()
+                //3.开启渲染管线         RenderMesh()
+                //4.屏幕绘制             canvas.DrawImage() 
                 
+                UpdateTransform();
+                ClearBuffer();
+                RenderMesh();
                 canvas.DrawImage(buffer, 0, 0);
+
             }
 
         }
 
 
-        //该函数保证lhs<rhs
-        private void LhsLowerThanRhs(ref int lhs, ref int rhs) {
-            if (lhs > rhs)
-                swap(ref lhs, ref rhs);
-        }
-
-        private void swap<T>(ref T lhs, ref T rhs) {
-            T temp = lhs;
-            lhs = rhs;
-            rhs = temp;
-        }
-
-        private void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
-
-            LhsLowerThanRhs(ref x1, ref x2);
-            for (int x = x1; x <= x2; ++x)
-                buffer.SetPixel(x, y1, Color.Red);
-        }
-
-        private void DrawVerticalLine(int x1, int y1, int x2, int y2) {
-
-            LhsLowerThanRhs(ref y1, ref y2);
-            for (int y = y1; y <= y2; ++y)
-                buffer.SetPixel(x1, y, Color.Red);
-
-        }
-
-        void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
-
-            //处理两种特殊的情况
-            if (y1 == y2) {
-                //水平线
-                DrawHrizontalLine(x1, y1, x2, y2);
-            }
-            else if (x1 == x2) {
-                //垂直线
-                DrawVerticalLine(x1, y1, x2, y2);
-            }
-            else {
-
-                //根据斜率的正负判断步进是增还是减 
-                int stepy = (y2 > y1) ? 1 : -1;
-                int stepx = (x2 > x1) ? 1 : -1;
-
-                //gradient为true表示斜率大于1,否则表示斜率小于1
-                bool gradient = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
-
-                int dx = Math.Abs(x2 - x1);
-                int dy = Math.Abs(y2 - y1);
-                int error = 0;
-
-                //斜率>1,说明y变化较快,为了不让画出点稀疏,让y步进,计算x的值
-                if (gradient) {
-
-                    int x = Math.Min(x1, x2);
-                    LhsLowerThanRhs(ref y1, ref y2);
-                    error = -dy;
-
-                    for (int y = y1; y <= y2; ++y) {
-
-                        buffer.SetPixel(x, y, Color.Red);
-                        
-                        error = error + dx + dx;
-                        if (error >= 0) {
-                            error = error - dy - dy;
-                            x += stepx;
-                        }
-
-                    }
-                }
-                //斜率<1,说明x变换较快,为了不让画出的点稀疏,让x步进,计算y的值
-                else {
-
-                    int y = Math.Min(y1, y2);
-                    LhsLowerThanRhs(ref x1, ref x2);
-                    error = -dx;
-
-                    for (int x = x1; x <= x2; ++x) {
-
-                        buffer.SetPixel(x, y, Color.Red);
-
-                        error = error + dy + dy;
-                        if (error >= 0) {
-                            error = error - dx - dx;
-                            y += stepy;
-                        }
-
-                    }
-                }
-            }
-        }
 
     }
+       
 }
