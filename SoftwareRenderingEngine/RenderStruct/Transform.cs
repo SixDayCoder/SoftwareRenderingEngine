@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+
 using SoftwareRenderingEngine.Math3D;
 
 namespace SoftwareRenderingEngine.RenderStruct {
 
-    public class Transform {
+    public static class Transform {
 
-        public Matrix4X4 model;
+        public static Matrix4X4 world;
 
-        public Matrix4X4 view;
+        public static Matrix4X4 view;
 
-        public Matrix4X4 projection;
+        public static Matrix4X4 projection;
 
-        public Matrix4X4 MVP {
+        public static Matrix4X4 transform {
 
             get {
-                return model * view * projection;
+                return world * view * projection;
             }
 
         }
@@ -33,7 +35,13 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <returns></returns>
         public static Vertex TransformToWorld(Vertex v) {
 
-            return new Vertex();
+            //顶点的世界空间坐标
+            v.position = v.position * world;
+
+            //顶点的世界空间法向量
+            //v.normal = (v.normal * world.Inverse().Transpose()).Normalize();
+
+            return v;
 
         }
 
@@ -44,8 +52,9 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <returns></returns>
         public static Vertex TransformToView(Vertex v) {
 
-            return new Vertex();
+            v.position = v.position * view;
 
+            return v;
         }
 
         /// <summary>
@@ -55,9 +64,16 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <returns></returns>
         public static Vertex TransformToCVV(Vertex v) {
 
-            //透视矫正
+            v.position = v.position * projection;
 
-            return new Vertex();
+            //透视矫正
+            float rhw = 1.0f / v.position.w;
+            v.rhw = rhw;
+            v.u *= rhw;
+            v.v *= rhw;
+            v.color *= rhw;
+            
+            return v;
 
         }
 
@@ -69,9 +85,31 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <param name="height">视口的高度</param>
         /// <returns></returns>
         public static Vertex TransformToViewport(Vertex v, int width, int height) {
-            //1.透视除法
-            //2.屏幕映射
-            return new Vertex();
+
+            if (v.position.w != 0) {
+                //1.透视除法,完成从三维坐标到二维坐标的映射
+                //reciprocal homogeneous w   reciprocal->倒数 homogeneous -> 齐次
+                //float rhw = 1.0f / v.position.w;
+
+                float rhw = v.rhw;
+                v.position.x *= rhw;
+                v.position.y *= rhw;
+                v.position.z *= rhw;
+                v.position.w = 1.0f;
+
+                //2.屏幕映射
+                //调整x,y到输出窗口 这里实际上也是利用了线性插值
+                //x[-1,1] -> x'[0,width]      (x'-0)/(width-0) = (x -(-1))/(1-(-1))  整理得  x' = (x + 1) * 0.5 * width
+                v.position.x = (v.position.x + 1) * 0.5f * width;
+
+                //y变换时需要特别注意,在屏幕上y是向下增长的,需要倒转y轴
+                //-y[-1,1] -> y'[0, height]     (y'-0)/(height-0) = (-y -(-1))/(1-(-1))  整理得  y' = (1 - y) * 0.5 * height
+                v.position.y = (1 - v.position.y) * 0.5f * height;
+
+                return v;
+            }
+            else
+                return null;
 
         }
         

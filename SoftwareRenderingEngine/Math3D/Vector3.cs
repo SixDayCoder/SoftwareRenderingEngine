@@ -16,13 +16,14 @@ namespace SoftwareRenderingEngine.Math3D {
         public float w;
 
 
-        public Vector3(float x = 0, float y = 0, float z = 0, float w = 0) {
+        public Vector3(float x, float y, float z, float w) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.w = w;
         }
 
+        //此时,Vector3是一个点
         public Vector3(float x, float y, float z) {
             this.x = x;
             this.y = y;

@@ -36,6 +36,33 @@ namespace SoftwareRenderingEngine.RenderStruct {
          * 
          * 
          */
+
+        public Mesh() {
+
+        }
+
+        /*
+        public Mesh(Vector3[] positions, int[,] indexs, Point2[] uvs, Color4[] colors, Vector3[] normals) {
+
+            indices = indexs;
+
+            vertices = new Vertex[positions.Length];
+
+            for(int i = 0; i < positions.Length; ++i) {
+
+                Vertex v = new Vertex();
+
+                v.position = positions[i];
+                v.u = uvs[i].x;
+                v.v = uvs[i].y;
+                v.color = colors[i];
+                v.normal = normals[i];
+                
+                vertices[i] = v;
+            }
+        }
+
+        */
     }
 
 }

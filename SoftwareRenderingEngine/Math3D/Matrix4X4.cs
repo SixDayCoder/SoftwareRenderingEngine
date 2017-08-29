@@ -265,6 +265,10 @@ namespace SoftwareRenderingEngine.Math3D {
 
         }
 
+        public static Matrix4X4 WorldMatrix(Matrix4X4 scale, Matrix4X4 rotate, Matrix4X4 translate) {
+            return scale * rotate * translate;
+        }
+
         #endregion
 
 

@@ -31,7 +31,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
         //远平面
         public float zf;
 
-        public void SetUp(Vector3 pos, Vector3 target, Vector3 up, float fov, float aspect, float zn, float zf) {
+        public Camera(Vector3 pos, Vector3 target, Vector3 up, float fov, float aspect, float zn, float zf) {
 
             this.pos = pos;
             this.target = target;

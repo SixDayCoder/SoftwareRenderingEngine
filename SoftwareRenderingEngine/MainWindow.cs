@@ -29,9 +29,11 @@ namespace SoftwareRenderingEngine {
 
         private Graphics canvas = null;
 
-        private Bitmap buffer = null;
+        private Bitmap buffer = null; 
 
         private float[,] zbuffer = null;
+
+        private Camera camera = null;
 
         private List<Mesh> meshs = null;
 
@@ -86,6 +88,11 @@ namespace SoftwareRenderingEngine {
             //根据buffer的大小设定zbuffer
             zbuffer = new float[this.Width, this.Height];
 
+            //创建摄像机, 摄像机位置默认为(0,0,-10),朝向坐标原点(0,0,0),以(0,0,1)为单位up向量,视角为90度,zn = 1, zf = 500
+            camera = new Camera(new Vector3(0, 0, -10), new Vector3(0, 0, 0), new Vector3(0, 0, 1),
+                                 3.1415926f / 4, this.Width / this.Height,
+                                 1.0f, 500.0f);
+
             //meshs,要渲染的网格列表
             meshs = new List<Mesh>();
 
@@ -99,6 +106,22 @@ namespace SoftwareRenderingEngine {
         //根据键盘的输入调整摄像机等,确定各个变换矩阵
         private void UpdateTransform() {
 
+            #region 根据输入来设定模型的scale rotation translate矩阵
+            Matrix4X4 scale = new Matrix4X4();
+            Matrix4X4 rotation = new Matrix4X4();
+            Matrix4X4 translate = new Matrix4X4();
+            #endregion
+
+            //1.设定world矩阵
+            Transform.world = Matrix4X4.WorldMatrix(scale, rotation, translate);
+
+            //2.设定view变换矩阵
+            Transform.view = Matrix4X4.ViewMatrix(camera);
+
+            //3.设定projection矩阵
+            Transform.projection = Matrix4X4.PerspectiveMatrix(camera.fov, camera.aspect, camera.zn, camera.zf);
+
+            
         }
 
 
@@ -137,14 +160,8 @@ namespace SoftwareRenderingEngine {
 
                     Triangle triangle = new Triangle(mesh.vertices[index1], mesh.vertices[index2], mesh.vertices[index3]);
 
-                    Point2 p1 = new Point2(triangle.top.position);
-                    Point2 p2 = new Point2(triangle.middle.position);
-                    Point2 p3 = new Point2(triangle.bottom.position);
-
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p2.x, (int)p2.y, (int)p3.x, (int)p3.y);
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p3.x, (int)p3.y);
-
+                    RenderUtility.DrawTraingle(ref buffer, triangle);
+                
                 }
             }
         
@@ -179,8 +196,6 @@ namespace SoftwareRenderingEngine {
             }
 
         }
-
-
 
     }
        

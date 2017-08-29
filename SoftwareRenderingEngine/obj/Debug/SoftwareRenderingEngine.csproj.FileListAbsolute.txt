@@ -6,3 +6,4 @@ E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEn
 E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.csproj.GenerateResource.Cache
 E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.exe
 E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.pdb
+E:\SoftwareRenderingEngine\SoftwareRenderingEngine\obj\Debug\SoftwareRenderingEngine.csprojResolveAssemblyReference.cache

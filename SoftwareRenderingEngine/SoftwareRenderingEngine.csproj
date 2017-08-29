@@ -51,6 +51,7 @@
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="MainEntry.cs" />
+    <Compile Include="Math3D\Color4.cs" />
     <Compile Include="Math3D\Matrix4X4.cs" />
     <Compile Include="Math3D\Point2.cs" />
     <Compile Include="Math3D\Vector3.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="RenderStruct\Transform.cs" />
     <Compile Include="RenderStruct\Triangle.cs" />
     <Compile Include="RenderStruct\Vertex.cs" />
+    <Compile Include="TestData\Cube.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\RenderUtility.cs" />
     <EmbeddedResource Include="MainWindow.resx">
