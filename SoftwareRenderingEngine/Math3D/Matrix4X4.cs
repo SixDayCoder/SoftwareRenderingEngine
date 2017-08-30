@@ -81,9 +81,11 @@ namespace SoftwareRenderingEngine.Math3D {
 
         public static Matrix4X4 operator* (Matrix4X4 matrix, float factor) {
 
+            Matrix4X4 result = new Matrix4X4();
+
             for(int i = 0; i < 4; ++i) {
                 for(int j = 0; j < 4; ++j) {
-                    matrix[i, j] *= factor;
+                    result[i, j] = matrix[i,j] * factor;
                 }
             }
             return matrix;
@@ -141,10 +143,11 @@ namespace SoftwareRenderingEngine.Math3D {
         public static Matrix4X4 RotateMatrix(Vector3 vec, float theta) {
 
             //单位化旋转向量,计算方便
-            vec.Normalize();
-            float x = vec.x;
-            float y = vec.y;
-            float z = vec.z;
+            Vector3 v = vec.Normalize();
+
+            float x = v.x;
+            float y = v.y;
+            float z = v.z;
             float sin = (float)Math.Sin(theta);
             float cos = (float)Math.Cos(theta);
 
@@ -220,15 +223,15 @@ namespace SoftwareRenderingEngine.Math3D {
         /// <summary>
         /// D3DXMatrixPerspectiveFovLH,获取投影矩阵
         /// </summary>
-        /// <param name="fov">摄像机视角</param>
+        /// <param name="fovy">y方向的摄像机视角</param>
         /// <param name="aspect">屏幕宽高比</param>
         /// <param name="zn">近平面</param>
         /// <param name="zf">远平面</param>
         /// <returns></returns>
-        public static Matrix4X4 PerspectiveMatrix(float fov, float aspect, float zn, float zf) {
+        public static Matrix4X4 PerspectiveMatrix(float fovy, float aspect, float zn, float zf) {
 
             Matrix4X4 matrix = new Matrix4X4();
-            float tanHalfFov = (float)Math.Tan(fov * 0.5f);
+            float tanHalfFov = (float)Math.Tan(fovy * 0.5f);
 
             matrix[0, 0] = 1 / ( tanHalfFov * aspect );
             matrix[1, 1] = 1 / tanHalfFov;
@@ -267,6 +270,22 @@ namespace SoftwareRenderingEngine.Math3D {
 
         public static Matrix4X4 WorldMatrix(Matrix4X4 scale, Matrix4X4 rotate, Matrix4X4 translate) {
             return scale * rotate * translate;
+        }
+
+        public static Matrix4X4 Identity() {
+
+            Matrix4X4 I = new Matrix4X4();
+            I.SetIdentity();
+            return I;
+
+        }
+
+        public static Matrix4X4 Zero() {
+
+            Matrix4X4 I = new Matrix4X4();
+            I.SetZero();
+            return I;
+
         }
 
         #endregion

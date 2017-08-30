@@ -35,6 +35,16 @@ namespace SoftwareRenderingEngine.RenderStruct {
             color = new Color4();
         }
 
+        public Vertex(Vertex v) {
+
+            this.position = v.position;
+            this.normal = v.normal;
+            this.u = v.u;
+            this.v = v.v;
+            this.color = v.color;
+            this.rhw = v.rhw;
+        }
+
         #region static方法
 
         public static Vertex Lerp(Vertex min, Vertex max, float factor) {

@@ -8,12 +8,13 @@ using SoftwareRenderingEngine.Utility;
 
 namespace SoftwareRenderingEngine.RenderStruct {
 
+    //该数据结构用于位于屏幕坐标系下的点
     public class Triangle {
 
-        //三角形的三个顶点
-        //top y值最大的点 
-        //middle y值第二大的点
-        //bottom y值最小的点
+        //三角形的三个顶点,考虑到屏幕是的y轴是反转的
+        //top    y值最小的点 
+        //middl
+        //bottom y值最大的点
         public Vertex top;
 
         public Vertex middle;
@@ -30,7 +31,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
 
         }
 
-        //按照一定的顺序计算该三角形的面法向量,保证法向量指向观察者的方向
+        //左手系,按照一定的顺序计算该三角形的面法向量,保证法向量指向观察者的方向
         private void CalculateNormal() {
 
             Vector3 v1 = middle.position - top.position;

@@ -96,14 +96,14 @@ namespace SoftwareRenderingEngine.Utility {
         //渲染管线的几何阶段
         public static void DrawTraingle(ref Bitmap buffer, Triangle triangle) {
 
+           
+            Vertex p1 = Transform.CompleteTransform(triangle.top, buffer.Width, buffer.Height);
+            Vertex p2 = Transform.CompleteTransform(triangle.middle, buffer.Width, buffer.Height);
+            Vertex p3 = Transform.CompleteTransform(triangle.bottom, buffer.Width, buffer.Height);
 
-            Point2 p1 = new Point2(triangle.top.position);
-            Point2 p2 = new Point2(triangle.middle.position);
-            Point2 p3 = new Point2(triangle.bottom.position);
-
-            BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
-            BresenhamDrawLine(ref buffer, (int)p2.x, (int)p2.y, (int)p3.x, (int)p3.y);
-            BresenhamDrawLine(ref buffer, (int)p1.x, (int)p1.y, (int)p3.x, (int)p3.y);
+            BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p2.position.x, (int)p2.position.y);
+            BresenhamDrawLine(ref buffer, (int)p2.position.x, (int)p2.position.y, (int)p3.position.x, (int)p3.position.y);
+            BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p3.position.x, (int)p3.position.y);
 
         }
 

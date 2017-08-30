@@ -17,36 +17,45 @@ namespace SoftwareRenderingEngine.TestData {
         //顶点坐标
         public static Vector3[] positions = {
 
-            new Vector3(-1,  1, -1),
-            new Vector3(-1, -1, -1),
-            new Vector3( 1, -1, -1),
-            new Vector3( 1,  1, -1),
+            //0~3
             new Vector3(-1,  1,  1),
-            new Vector3(-1, -1,  1),
+            new Vector3( 1,  1,  1),
             new Vector3( 1, -1,  1),
-            new Vector3( 1,  1,  1)
+            new Vector3(-1, -1,  1),
+
+            //4~7
+            new Vector3(-1,  1, -1),
+            new Vector3( 1,  1, -1),
+            new Vector3( 1, -1, -1),
+            new Vector3(-1, -1, -1)
 
         };
 
-        //顶点索引
-        public static int[,] indices = new int[,]{
+        //顶点索引,12个面
+        public static int[,] indices = {
+            //后面
             {0, 1, 2},
             {0, 2, 3},
-            {7, 6, 5},
-            {7, 5, 4},
-            {0, 4, 5},
-            {0, 5, 1},
-            {1, 5 ,6},
-            {1, 6, 2},
-            {2, 6, 7},
-            {2, 7, 3},
-            {3, 7, 4},
-            {3, 4, 0}
-        };
 
-        //u,v坐标
-        public static Point2[] uvs = {
+            //前面
+            {4, 5, 6},
+            {4, 6, 7},
 
+            //上面
+            {0, 1, 5},
+            {0, 5, 4},
+
+            //下面
+            {3, 2, 6},
+            {3, 6, 7},
+
+            //左面
+            {0, 4, 7},
+            {0, 7, 3},
+
+            //右面
+            {5, 1, 2},
+            {5, 2, 6}
         };
 
     }

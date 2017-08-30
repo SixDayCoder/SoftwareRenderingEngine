@@ -59,6 +59,10 @@ namespace SoftwareRenderingEngine.Math3D {
             return this;
         }
 
+        public override string ToString() {
+            return string.Format("({0}, {1}, {2}, {3})", x, y, z, w);
+        }
+
         #region 重载运算符
         public static Vector3 operator * (Vector3 vec, float factor) {
             Vector3 v = new Vector3();

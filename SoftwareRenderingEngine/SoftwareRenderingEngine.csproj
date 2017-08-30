@@ -62,6 +62,8 @@
     <Compile Include="RenderStruct\Triangle.cs" />
     <Compile Include="RenderStruct\Vertex.cs" />
     <Compile Include="TestData\Cube.cs" />
+    <Compile Include="TestData\Primitive.cs" />
+    <Compile Include="TestData\Quad.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\RenderUtility.cs" />
     <EmbeddedResource Include="MainWindow.resx">
