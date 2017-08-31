@@ -69,13 +69,15 @@ namespace SoftwareRenderingEngine.Math3D {
         public static Matrix4X4 operator* (Matrix4X4 lhs, Matrix4X4 rhs) {
 
             Matrix4X4 result = new Matrix4X4();
-            
+
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
-                    result[j, i] = (lhs[j, 0] * rhs[0, i]) + (lhs[j, 1] * rhs[1, i]) +
-                                   (lhs[j, 2] * rhs[2, i]) + (lhs[j, 3] * rhs[3, i]);
+                    for (int k = 0; k < 4; k++) {
+                        result[i, j] += lhs[i, k] * rhs[k, j];
+                    }
                 }
             }
+
             return result;
         }
 
@@ -98,7 +100,6 @@ namespace SoftwareRenderingEngine.Math3D {
 
 
         #endregion  
-
 
         #region static方法,旋转,平移,放缩,透视投影,相机变换矩阵
 
@@ -289,7 +290,6 @@ namespace SoftwareRenderingEngine.Math3D {
         }
 
         #endregion
-
 
         #region 转置,行列式,逆矩阵
 

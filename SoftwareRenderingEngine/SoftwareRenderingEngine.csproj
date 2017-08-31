@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderStruct\Camera.cs" />
     <Compile Include="RenderStruct\Mesh.cs" />
+    <Compile Include="RenderStruct\RenderType.cs" />
     <Compile Include="RenderStruct\Transform.cs" />
     <Compile Include="RenderStruct\Triangle.cs" />
     <Compile Include="RenderStruct\Vertex.cs" />

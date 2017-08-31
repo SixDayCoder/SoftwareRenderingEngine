@@ -12,98 +12,108 @@ namespace SoftwareRenderingEngine.Utility {
 
     public static class RenderUtility {
 
-        private static void DrawHrizontalLine(ref Bitmap buffer, int x1, int y1, int x2, int y2) {
+        public static void SetFrameBuffer(Bitmap buffer) {
+            frameBuffer = buffer;
+        }
+
+        private static Bitmap frameBuffer;
+
+        private static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref x1, ref x2);
             for (int x = x1; x <= x2; ++x)
-                buffer.SetPixel(x, y1, Color.Red);
+                frameBuffer.SetPixel(x, y1, Color.Red);
         }
 
-        private static void DrawVerticalLine(ref Bitmap buffer, int x1, int y1, int x2, int y2) {
+        private static void DrawVerticalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref y1, ref y2);
 
             for (int y = y1; y <= y2; ++y)
-                buffer.SetPixel(x1, y, Color.Red);
+                frameBuffer.SetPixel(x1, y, Color.Red);
 
         }
 
-        public static void BresenhamDrawLine(ref Bitmap buffer, int x1, int y1, int x2, int y2) {
+        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
 
-            //处理两种特殊的情况
-            if (y1 == y2) {
+
+            //处理三两种特殊的情况
+            if (x1 == x2 && y1 == y2) {
+                frameBuffer.SetPixel(x1, y1, Color.Red);
+            }
+            else if (y1 == y2) {
                 //水平线
-                DrawHrizontalLine(ref buffer, x1, y1, x2, y2);
+                DrawHrizontalLine(x1, y1, x2, y2);
             }
             else if (x1 == x2) {
                 //垂直线
-                DrawVerticalLine(ref buffer, x1, y1, x2, y2);
+                DrawVerticalLine(x1, y1, x2, y2);
             }
             else {
 
-                //根据斜率的正负判断步进是增还是减 
-                int stepy = (y2 > y1) ? 1 : -1;
-                int stepx = (x2 > x1) ? 1 : -1;
+                int x = 0, y = 0, error = 0;
+                int dx = (x1 < x2) ? x2 - x1 : x1 - x2;
+                int dy = (y1 < y2) ? y2 - y1 : y1 - y2;
 
-                //gradient为true表示斜率大于等于1,否则表示斜率小于1
-                bool gradient = Math.Abs(y2 - y1) >= Math.Abs(x2 - x1);
+                //此时,斜率的绝对值小于1,说明x的变化快,为了不让画出的点稀疏,让x步进,计算y的值
+                if (dx >= dy) {
 
-                int dx = Math.Abs(x2 - x1);
-                int dy = Math.Abs(y2 - y1);
-                int error = 0;
-
-                //斜率>1,说明y变化较快,为了不让画出点稀疏,让y步进,计算x的值
-                if (gradient) {
-
-                    int x = Math.Min(x1, x2);
-                    MathUtility.LhsLowerThanRhs(ref y1, ref y2);
-                    error = -dy;
-
-                    for (int y = y1; y <= y2; ++y) {
-
-                        buffer.SetPixel(x, y, Color.Red);
-
-                        error = error + dx + dx;
-                        if (error >= 0) {
-                            error = error - dy - dy;
-                            x += stepx;
-                        }
-
+                    if (x2 < x1) {
+                        x  = x1;   y  = y1;
+                        x1 = x2;   y1 = y2;
+                        x2 = x;    y2 = y;
                     }
+                    for (x = x1, y = y1; x <= x2; x++) {
+                        frameBuffer.SetPixel(x, y, Color.Red);
+                        error += dy;
+                        if (error >= dx) {
+                            error -= dx;
+                            y += (y2 >= y1) ? 1 : -1;
+                            frameBuffer.SetPixel(x, y, Color.Red);
+                        }
+                    }
+
+                    frameBuffer.SetPixel(x2, y2, Color.Red);
                 }
-                //斜率<1,说明x变换较快,为了不让画出的点稀疏,让x步进,计算y的值
+                //此时,斜率的绝对值大于1,说明x的变化快,为了不让画出的点稀疏,让x步进,计算y的值
                 else {
 
-                    int y = Math.Min(y1, y2);
-                    MathUtility.LhsLowerThanRhs(ref x1, ref x2);
-                    error = -dx;
-
-                    for (int x = x1; x <= x2; ++x) {
-
-                        buffer.SetPixel(x, y, Color.Red);
-
-                        error = error + dy + dy;
-                        if (error >= 0) {
-                            error = error - dx - dx;
-                            y += stepy;
-                        }
-
+                    if (y2 < y1) {
+                        x  = x1;  y  = y1;
+                        x1 = x2;  y1 = y2;
+                        x2 = x;   y2 = y;
                     }
+                    for (x = x1, y = y1; y <= y2; y++) {
+                        frameBuffer.SetPixel(x, y, Color.Red);
+                        error += dx;
+                        if (error >= dy) {
+                            error -= dy;
+                            x += (x2 >= x1) ? 1 : -1;
+                            frameBuffer.SetPixel(x, y, Color.Red);
+                        }
+                    }
+
+                    frameBuffer.SetPixel(x, y, Color.Red);
                 }
             }
+
         }
 
-        //渲染管线的几何阶段
-        public static void DrawTraingle(ref Bitmap buffer, Triangle triangle) {
+        public static void DrawTriangle(Vertex p1, Vertex p2, Vertex p3) {
 
-           
-            Vertex p1 = Transform.CompleteTransform(triangle.top, buffer.Width, buffer.Height);
-            Vertex p2 = Transform.CompleteTransform(triangle.middle, buffer.Width, buffer.Height);
-            Vertex p3 = Transform.CompleteTransform(triangle.bottom, buffer.Width, buffer.Height);
+            Transform.TransformAll(ref p1, frameBuffer.Width, frameBuffer.Height);
+            Transform.TransformAll(ref p2, frameBuffer.Width, frameBuffer.Height);
+            Transform.TransformAll(ref p3, frameBuffer.Width, frameBuffer.Height);
 
-            BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p2.position.x, (int)p2.position.y);
-            BresenhamDrawLine(ref buffer, (int)p2.position.x, (int)p2.position.y, (int)p3.position.x, (int)p3.position.y);
-            BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p3.position.x, (int)p3.position.y);
+                       
+            BresenhamDrawLine( MathUtility.RoundToInt(p1.position.x), MathUtility.RoundToInt(p1.position.y),
+                               MathUtility.RoundToInt(p2.position.x), MathUtility.RoundToInt(p2.position.y) );
+
+            BresenhamDrawLine( MathUtility.RoundToInt(p2.position.x), MathUtility.RoundToInt(p2.position.y),
+                               MathUtility.RoundToInt(p3.position.x), MathUtility.RoundToInt(p3.position.y));
+
+            BresenhamDrawLine( MathUtility.RoundToInt(p1.position.x), MathUtility.RoundToInt(p1.position.y),
+                               MathUtility.RoundToInt(p3.position.x), MathUtility.RoundToInt(p3.position.y));
 
         }
 

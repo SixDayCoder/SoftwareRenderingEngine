@@ -13,19 +13,16 @@ namespace SoftwareRenderingEngine.TestData {
         //顶点坐标
         public static Vector3[] positions = {
 
-            //0~3,相当于立方体的下面
-            new Vector3(-1, -1,  1),
-            new Vector3( 1, -1,  1),
+            new Vector3(-1,  1,  1),
+            new Vector3( 1,  1,  1),
             new Vector3( 1, -1, -1),
             new Vector3(-1, -1, -1),
 
         };
 
         public static int[,] indices = {
-
-            {0, 1, 2},
-            {0, 2, 3}
-
+            {0, 2, 3},
+            {0, 1, 2}
         };
 
     }

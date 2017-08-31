@@ -19,7 +19,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
         //自定义的竖直方向,这里取(0,0,1)
         public Vector3 up;
 
-        //视域,弧度
+        //y的视域视域,弧度
         public float fov;
 
         //宽高比

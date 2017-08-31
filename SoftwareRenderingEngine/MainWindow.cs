@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Timers;
 
@@ -15,7 +10,6 @@ using SoftwareRenderingEngine.Utility;
 using SoftwareRenderingEngine.TestData;
 
 namespace SoftwareRenderingEngine {
-
 
 
     /// <summary>
@@ -28,6 +22,8 @@ namespace SoftwareRenderingEngine {
 
     public partial class MainWindow : Form {
 
+        #region 变量
+
         private Graphics canvas = null;
 
         private Bitmap buffer = null; 
@@ -37,6 +33,8 @@ namespace SoftwareRenderingEngine {
         private Camera camera = null;
 
         private List<Mesh> meshs = null;
+            
+        #endregion
 
         public MainWindow() {
 
@@ -47,6 +45,7 @@ namespace SoftwareRenderingEngine {
 
             //当前窗口的宽高值
             buffer = new Bitmap(this.Width, this.Height);
+            RenderUtility.SetFrameBuffer(buffer);
 
             //根据buffer的大小设定zbuffer
             zbuffer = new float[this.Width, this.Height];
@@ -74,9 +73,9 @@ namespace SoftwareRenderingEngine {
             Mesh quad = new Mesh(Quad.positions, Quad.indices);
             Mesh cube = new Mesh(Cube.positions, Cube.indices);
 
-            meshs.Add(primitive);
+            //meshs.Add(primitive);
             //meshs.Add(quad);
-            //meshs.Add(cube);
+            meshs.Add(cube);
         }
 
         #endregion
@@ -100,8 +99,8 @@ namespace SoftwareRenderingEngine {
             //必须先缩放再旋转再平移
 
             Matrix4X4 scale = Matrix4X4.ScaleMatrix(1, 1, 1);
-            Matrix4X4 rotation = Matrix4X4.Identity();//不做旋转
-            Matrix4X4 translate = Matrix4X4.TranslateMatrix(0, 0, 5);
+            Matrix4X4 rotation = Matrix4X4.RotateMatrix(new Vector3(-1, -2, -3, 0), 3.1415926f / 4f);
+            Matrix4X4 translate = Matrix4X4.TranslateMatrix(0, 0, 10);
 
             #endregion
 
@@ -122,7 +121,7 @@ namespace SoftwareRenderingEngine {
             //清空缓存
             for (int x = 0; x < buffer.Width; ++x) {
                 for (int y = 0; y < buffer.Height; ++y) {
-                    buffer.SetPixel(x, y, Color.Black);
+                    buffer.SetPixel(x, y, Color.Gray);
                 }
             }
 
@@ -136,28 +135,18 @@ namespace SoftwareRenderingEngine {
         //渲染Mesh网格
         private void RenderMesh() {
 
-            int rows = 0;
-            int index1 = 0, index2 = 0, index3 = 0;
-
             foreach(Mesh mesh in meshs) {
 
-                rows = mesh.indices.GetLength(0);
-
+                //二维数组的行数
+                int rows = mesh.indices.GetLength(0);
+          
                 for (int i = 0; i < rows; ++i) {
 
-                    index1 = mesh.indices[i, 0];
-                    index2 = mesh.indices[i, 1];
-                    index3 = mesh.indices[i, 2];
-                    
-                    Vertex p1 = Transform.CompleteTransform(mesh.vertices[index1], buffer.Width, buffer.Height);
-                    Vertex p2 = Transform.CompleteTransform(mesh.vertices[index2], buffer.Width, buffer.Height);
-                    Vertex p3 = Transform.CompleteTransform(mesh.vertices[index3], buffer.Width, buffer.Height);
- 
+                    Vertex p1 = new Vertex( mesh.vertices[ mesh.indices[i, 0] ] );
+                    Vertex p2 = new Vertex( mesh.vertices[ mesh.indices[i, 1] ] );
+                    Vertex p3 = new Vertex( mesh.vertices[ mesh.indices[i, 2] ] );
 
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p2.position.x, (int)p2.position.y);
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p2.position.x, (int)p2.position.y, (int)p3.position.x, (int)p3.position.y);
-                    RenderUtility.BresenhamDrawLine(ref buffer, (int)p1.position.x, (int)p1.position.y, (int)p3.position.x, (int)p3.position.y);
-                    
+                    RenderUtility.DrawTriangle(p1, p2, p3);
 
                 }
             }
@@ -169,27 +158,15 @@ namespace SoftwareRenderingEngine {
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         private void Update(object sender, EventArgs e) {
 
-            /*
-             lock(object){
-                code
-             } 
-             1. object被lock了吗？没有则由我来lock，否则一直等待，直至object被释放。
-             2. lock以后在执行code的期间其他线程不能调用code，也不能使用object。
-             3. 执行完codeB之后释放object，并且code可以被其他线程访问。
-            */
-
+            //1.根据输入更新变换矩阵  UpdateTransform()
+            //2.清除缓存             ClearBuffer()
+            //3.开启渲染管线         RenderMesh()
+            //4.屏幕绘制             canvas.DrawImage() 
             lock (buffer) {
-
-                //1.根据输入更新变换矩阵  UpdateTransform()
-                //2.清除缓存             ClearBuffer()
-                //3.开启渲染管线         RenderMesh()
-                //4.屏幕绘制             canvas.DrawImage() 
-                
                 UpdateTransform();
                 ClearBuffer();
                 RenderMesh();
                 canvas.DrawImage(buffer, 0, 0);
-
             }
 
         }

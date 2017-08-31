@@ -18,6 +18,14 @@ namespace SoftwareRenderingEngine.Utility {
             }
         }
 
+        public static float Min(float lhs, float rhs) {
+            return lhs < rhs ? lhs : rhs;
+        }
+
+        public static int Min(int lhs, int rhs) {
+            return lhs < rhs ? lhs : rhs;
+        }
+
         /// <summary>
         /// 限制value的值为[min, max]
         /// </summary>
@@ -43,7 +51,6 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
-
         //该函数保证Lhs<rhs
         public static void LhsLowerThanRhs(ref int lhs, ref int rhs) {
             if (lhs > rhs)
@@ -54,6 +61,21 @@ namespace SoftwareRenderingEngine.Utility {
             if (lhs > rhs)
                 Swap(ref lhs, ref rhs);
         }
+
+        //float四舍五入到int
+        public static int RoundToInt(float f) {
+
+            int x = (int)f;
+            float frac = f - x;
+
+            if (frac > 0.5f)
+                return x + 1;
+
+            return x;
+
+        }
+
+
 
     }
 }

@@ -33,16 +33,13 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// </summary>
         /// <param name="v">位于局部坐标系下的点</param>
         /// <returns></returns>
-        public static Vertex TransformToWorld(Vertex v) {
+        public static void TransformToWorld(ref Vertex v) {
 
-            Vertex nv = new Vertex(v);
             //顶点的世界空间坐标
-            nv.position = nv.position * world;
+            v.position = v.position * world;
 
             //顶点的世界空间法向量
             //v.normal = (v.normal * world.Inverse().Transpose()).Normalize();
-
-            return nv;
 
         }
 
@@ -51,13 +48,12 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public static Vertex TransformToView(Vertex v) {
+        public static void TransformToView(ref Vertex v) {
+ 
+            v.position = v.position * view;
 
-            Vertex nv = new Vertex(v);
+            //在相机空间下对三角面片做BackCulling
 
-            nv.position = nv.position * view;
-
-            return nv;
         }
 
         /// <summary>
@@ -65,21 +61,17 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public static Vertex TransformToHomogeneous(Vertex v) {
+        public static void TransformToHomogeneous(ref Vertex v) {
 
-            Vertex nv = new Vertex(v);
-
-            nv.position = nv.position * projection;
+            v.position = v.position * projection;
 
             //透视矫正
-            float rhw = 1.0f / nv.position.w;
+            float rhw = 1.0f / v.position.w;
 
-            nv.rhw = rhw;
-            nv.u *= rhw;
-            nv.v *= rhw;
-            nv.color *= rhw;
-            
-            return nv;
+            v.rhw = rhw;
+            v.u *= rhw;
+            v.v *= rhw;
+            v.color *= rhw;
 
         }
 
@@ -90,34 +82,33 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <param name="width">视口的宽度</param>
         /// <param name="height">视口的高度</param>
         /// <returns></returns>
-        public static Vertex TransformToViewport(Vertex v, int width, int height) {
+        public static void TransformToViewport(ref Vertex v, int width, int height) {
 
-            Vertex nv = new Vertex(v);
+            if (v.position.w != 0) {
 
-            if (nv.position.w != 0) {
                 //1.透视除法,完成从三维坐标到二维坐标的映射
                 //reciprocal homogeneous w   reciprocal->倒数 homogeneous -> 齐次
                 //float rhw = 1.0f / v.position.w;
 
-                float rhw = nv.rhw;
-                nv.position.x *= rhw;
-                nv.position.y *= rhw;
-                nv.position.z *= rhw;
-                nv.position.w = 1.0f;
+                float rhw = v.rhw;
+
+                v.position.x *= rhw;
+                v.position.y *= rhw;
+                v.position.z *= rhw;
+                v.position.w = 1.0f;
 
                 //2.屏幕映射
                 //调整x,y到输出窗口 这里实际上也是利用了线性插值
                 //x[-1,1] -> x'[0,width]      (x'-0)/(width-0) = (x -(-1))/(1-(-1))  整理得  x' = (x + 1) * 0.5 * width
-                nv.position.x = (nv.position.x + 1) * 0.5f * width;
+                v.position.x = (v.position.x + 1) * 0.5f * width;
 
                 //y变换时需要特别注意,在屏幕上y是向下增长的,需要倒转y轴
                 //-y[-1,1] -> y'[0, height]     (y'-0)/(height-0) = (-y -(-1))/(1-(-1))  整理得  y' = (1 - y) * 0.5 * height
-                nv.position.y = (1 - nv.position.y) * 0.5f * height;
-
-                return nv;
+                v.position.y = (1 - v.position.y) * 0.5f * height;
+                
             }
             else
-                return null;
+                return;
 
         }
 
@@ -127,18 +118,19 @@ namespace SoftwareRenderingEngine.RenderStruct {
         /// <param name="v">局部坐标系下的点</param>
         /// <param name="width">屏幕的宽度</param>
         /// <param name="height">屏幕的高度</param>
-        /// <returns>屏幕空间的点</returns>
+        public static void TransformAll (ref Vertex v, int width, int height) {
 
-        public static Vertex CompleteTransform(Vertex v, int width, int height) {
+            if (v != null) {
 
-            Vertex nv = new Vertex(v);
+                TransformToWorld(ref v);
+                TransformToView(ref v);
+                TransformToHomogeneous(ref v);
+                TransformToViewport(ref v, width, height);
 
-            nv = TransformToWorld(nv);
-            nv = TransformToView(nv);
-            nv = TransformToHomogeneous(nv);
-            nv = TransformToViewport(nv, width, height);
+            }
 
-            return nv;
+            //v为空引用
+            return;
 
         }
         
