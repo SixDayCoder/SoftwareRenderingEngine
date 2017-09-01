@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 using SoftwareRenderingEngine.Math3D;
 
@@ -42,7 +43,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
 
         }
 
-        public Mesh(Vector3[] positions, int[,] indexs) {
+        public Mesh(Vector3[] positions, int[,] indexs, Color4[] colors) {
 
             indices = indexs;
 
@@ -55,7 +56,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
                 v.position = positions[i];
                 v.u = 0;
                 v.v = 0;
-                v.color = new Color4(1, 0, 0, 1);//红色
+                v.color = colors[i];
                 v.normal = new Vector3(0, 0, 0, 0);
                 
                 vertices[i] = v;

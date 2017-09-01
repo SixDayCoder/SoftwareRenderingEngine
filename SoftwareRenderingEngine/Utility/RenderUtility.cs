@@ -47,7 +47,6 @@ namespace SoftwareRenderingEngine.Utility {
                 //三点共线
                 return null;
             }
-
             else {
 
                 //1.v1 > v2 > v3
@@ -115,7 +114,6 @@ namespace SoftwareRenderingEngine.Utility {
         }
 
         private static void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
-
 
             //处理三两种特殊的情况
             if (x1 == x2 && y1 == y2) {
@@ -186,10 +184,13 @@ namespace SoftwareRenderingEngine.Utility {
 
             for(float x = minx; x <= maxx; x += 1.0f) {
 
+                float factor = (x - minx) / (maxx - minx);
+                Vertex v = Vertex.Lerp(left, right, factor);
                 int xindex = MathUtility.RoundToInt(x);
 
+                //frameBuffer.SetPixel(xindex, yindex, v.color);
                 frameBuffer.SetPixel(xindex, yindex, Color.Red);
-
+                
             }
 
         }
@@ -198,8 +199,10 @@ namespace SoftwareRenderingEngine.Utility {
         //光栅化平底三角形
         private static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
 
-            float miny = bottomLeft.position.y;
-            float maxy = top.position.y;
+            float miny = top.position.y;
+            float maxy = bottomLeft.position.y;
+
+           
 
             for (float y = miny; y <= maxy; y += 1.0f) {
 
@@ -212,11 +215,10 @@ namespace SoftwareRenderingEngine.Utility {
 
             }
 
-
         }
 
         //光栅化平顶三角形
-        private static void RasterizationTrianglTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
+        private static void RasterizationTriangleTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
 
             float miny = topLeft.position.y;
             float maxy = bottom.position.y;
@@ -238,23 +240,24 @@ namespace SoftwareRenderingEngine.Utility {
         //光栅化三角形,任意一个三角形都可以被划分为平底三角形+平顶三角形
         private static void RasterizationTriangle(Vertex v1, Vertex v2, Vertex v3) {
 
-            Vertex[] result = RerangeVertex(v1, v2, v3);
+            Vertex[] sortedVertices = RerangeVertex(v1, v2, v3);
 
             //三点共线
-            if (result == null)
+            if (sortedVertices == null)
                 return;
 
-            Vertex top = result[0];
-            Vertex middle = result[1];
-            Vertex bottom = result[2];
+            Vertex top = sortedVertices[0];
+            Vertex middle = sortedVertices[1];
+            Vertex bottom = sortedVertices[2];
+
 
             //平顶三角形
             if(top.position.y == middle.position.y) {
 
                 if (top.position.x < middle.position.x)
-                    RasterizationTrianglTop(top, middle, bottom);
+                    RasterizationTriangleTop(top, middle, bottom);
                 else
-                    RasterizationTrianglTop(middle, top, bottom);
+                    RasterizationTriangleTop(middle, top, bottom);
 
             }
             //平底三角形
@@ -269,6 +272,7 @@ namespace SoftwareRenderingEngine.Utility {
             //普通的三角形,划分为一个平顶和一个平底
             else {
 
+                
                 float factor = (middle.position.y - top.position.y) / (bottom.position.y - top.position.y);
                 //插值求新的middle
                 Vertex newMiddle = Vertex.Lerp(top, bottom, factor);
@@ -289,18 +293,20 @@ namespace SoftwareRenderingEngine.Utility {
                 RasterizationTriangleBottom(left, right, top);
 
                 //绘制平顶三角形
-                RasterizationTrianglTop(left, right, bottom);
+                RasterizationTriangleTop(left, right, bottom);
             }
 
         }
 
-
         public static void DrawTriangle(Vertex p1, Vertex p2, Vertex p3) {
+
+            
 
             Transform.TransformAll(ref p1, frameBuffer.Width, frameBuffer.Height);
             Transform.TransformAll(ref p2, frameBuffer.Width, frameBuffer.Height);
             Transform.TransformAll(ref p3, frameBuffer.Width, frameBuffer.Height);
 
+            
             //线框模式
             if(renderType == RenderType.WireFrame) {
 
@@ -317,6 +323,7 @@ namespace SoftwareRenderingEngine.Utility {
                 RasterizationTriangle(p1, p2, p3);
 
             }
+            
 
         }
 

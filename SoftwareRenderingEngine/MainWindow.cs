@@ -77,13 +77,13 @@ namespace SoftwareRenderingEngine {
             //meshs,要渲染的网格列表
             meshs = new List<Mesh>();
 
-            Mesh primitive = new Mesh(Primitive.positions, Primitive.indices);
-            Mesh quad = new Mesh(Quad.positions, Quad.indices);
-            Mesh cube = new Mesh(Cube.positions, Cube.indices);
+            Mesh primitive = new Mesh(Primitive.positions, Primitive.indices, Primitive.colors);
+            Mesh quad = new Mesh(Quad.positions, Quad.indices, Quad.colors);
+            Mesh cube = new Mesh(Cube.positions, Cube.indices, Cube.colors);
 
-            meshs.Add(primitive);
+            //meshs.Add(primitive);
             //meshs.Add(quad);
-            //meshs.Add(cube);
+            meshs.Add(cube);
         }
 
         #endregion

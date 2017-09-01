@@ -18,37 +18,41 @@ namespace SoftwareRenderingEngine.Math3D {
 
         public float R {
             get {
+                r = MathUtility.Range(r, 0, 1f);
                 return r; 
             }
             set {
-                r = MathUtility.Range(value, 0, 1);
+                r = MathUtility.Range(value, 0, 1f);
             }
         }
 
         public float G {
             get {
+                g = MathUtility.Range(g, 0, 1f);
                 return g;
             }
             set {
-                g = MathUtility.Range(value, 0, 1);
+                g = MathUtility.Range(value, 0, 1f);
             }
         }
 
         public float B {
             get {
+                b = MathUtility.Range(b, 0, 1f);
                 return b;
             }
             set {
-                b = MathUtility.Range(value, 0, 1);
+                b = MathUtility.Range(value, 0, 1f);
             }
         }
 
         public float A {
             get {
+                a = MathUtility.Range(a, 0, 1f);
                 return a;
             }
             set {
-                a = MathUtility.Range(value, 0, 1);
+                a = MathUtility.Range(value, 0, 1f);
             }
         }
 
@@ -64,27 +68,35 @@ namespace SoftwareRenderingEngine.Math3D {
 
         public Color4(Color c) {
 
-            R = c.R / 255;
-            G = c.G / 255;
-            B = c.B / 255;
-            A = c.A / 255;
+            R = c.R / 255f;
+            G = c.G / 255f;
+            B = c.B / 255f;
+            A = c.A / 255f;
 
         }
 
+        public static Color4 Lerp(Color4 min, Color4 max, float factor) {
 
-        #region 隐式转换为System.Color
+            Color4 c = new Color4();
+
+            c.R = MathUtility.Lerp(min.R, max.R, factor);
+            c.G = MathUtility.Lerp(min.G, max.G, factor);
+            c.B = MathUtility.Lerp(min.B, max.B, factor);
+            //c.A = MathUtility.Lerp(min.A, max.A, factor);
+            c.A = 1;
+
+            return c;
+        }
 
         public static implicit operator Color(Color4 c) {
 
-            float r = c.R * 255;
-            float g = c.G * 255;
-            float b = c.B * 255;
-            float a = c.A * 255;
+            float r = c.R * 255f;
+            float g = c.G * 255f;
+            float b = c.B * 255f;
+            float a = c.A * 255f;
 
-            return Color.FromArgb((int)r, (int)g, (int)b, (int)a);
+            return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
         }
-
-        #endregion
 
 
         #region 重载运算符
@@ -108,19 +120,6 @@ namespace SoftwareRenderingEngine.Math3D {
         }
 
         #endregion
-
-        public static Color4 Lerp(Color4 min, Color4 max, float factor) {
-
-            Color4 c = new Color4();
-
-            c.R = MathUtility.Lerp(min.R, max.R, factor);
-            c.G = MathUtility.Lerp(min.G, max.G, factor);
-            c.B = MathUtility.Lerp(min.B, max.B, factor);
-            //c.A = MathUtility.Lerp(min.A, max.A, factor);
-            c.A = 1;
-
-            return c;
-        }
 
     }
 }

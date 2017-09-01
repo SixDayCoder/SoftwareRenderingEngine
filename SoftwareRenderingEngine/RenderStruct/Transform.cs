@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
+using SoftwareRenderingEngine.Utility;
 using SoftwareRenderingEngine.Math3D;
 
 namespace SoftwareRenderingEngine.RenderStruct {
@@ -72,7 +73,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
             v.u *= rhw;
             v.v *= rhw;
             v.color *= rhw;
-
+          
         }
 
         /// <summary>
@@ -133,8 +134,10 @@ namespace SoftwareRenderingEngine.RenderStruct {
             return;
 
         }
-        
+
+
+        #endregion
+
     }
 
-    #endregion
 }

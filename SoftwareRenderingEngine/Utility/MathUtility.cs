@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace SoftwareRenderingEngine.Utility {
 
@@ -15,6 +16,23 @@ namespace SoftwareRenderingEngine.Utility {
                 return max;
             else {
                 return min + (max - min) * factor;
+            }
+        }
+
+        public static Color Lerp(Color min, Color max, float factor) {
+
+            if (factor <= 0)
+                return min;
+            else if (factor >= 1)
+                return max;
+            else {
+
+                float r = Lerp(min.R, max.R, factor);
+                float g = Lerp(min.G, max.G, factor);
+                float b = Lerp(min.B, max.B, factor);
+
+                return Color.FromArgb((int)r, (int)g, (int)b);
+
             }
         }
 
@@ -74,8 +92,6 @@ namespace SoftwareRenderingEngine.Utility {
             return x;
 
         }
-
-
 
     }
 }

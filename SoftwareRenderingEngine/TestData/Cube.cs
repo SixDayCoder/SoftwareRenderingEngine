@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 using SoftwareRenderingEngine.Math3D;
 using SoftwareRenderingEngine.RenderStruct;
@@ -49,6 +50,21 @@ namespace SoftwareRenderingEngine.TestData {
 
              { 3,7,4 },
              { 3,4,0 }
+        };
+
+        //顶点颜色,8个顶点的不同颜色
+        public static Color4[] colors = {
+
+            new Color4(Color.Red),
+            new Color4(Color.Yellow),
+            new Color4(Color.Blue),
+            new Color4(Color.Brown),
+
+            new Color4(Color.Green),
+            new Color4(Color.HotPink),
+            new Color4(Color.Ivory),
+            new Color4(Color.Indigo)
+
         };
 
     }
