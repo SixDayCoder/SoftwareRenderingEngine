@@ -75,6 +75,10 @@ namespace SoftwareRenderingEngine.Math3D {
 
         }
 
+        public override string ToString() {
+            return string.Format("R {0}, G {1}, B {2}, A {3}", R, G, B, A);
+        }
+
         public static Color4 Lerp(Color4 min, Color4 max, float factor) {
 
             Color4 c = new Color4();
@@ -99,10 +103,11 @@ namespace SoftwareRenderingEngine.Math3D {
         }
 
 
+
         #region 重载运算符
 
         public static Color4 operator* (float factor, Color4 c) {
-            return new Color4(c.R * factor, c.G * factor, c.B * factor, c.A);
+            return new Color4(c.r * factor, c.g * factor, c.b * factor, 1.0f);
         }
 
         public static Color4 operator* (Color4 c, float factor) {
@@ -110,13 +115,13 @@ namespace SoftwareRenderingEngine.Math3D {
         }
 
         //颜色混合
-        public static Color4 operator *(Color4 lhs, Color rhs) {
-            return new Color4(lhs.R * rhs.R, lhs.G * rhs.G, lhs.B * rhs.B, lhs.A * rhs.A);
+        public static Color4 operator *(Color4 lhs, Color4 rhs) {
+            return new Color4(lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b, 1.0f);
         }
 
         //颜色叠加
-        public static Color4 operator +(Color4 lhs, Color rhs) {
-            return new Color4(lhs.R + rhs.R, lhs.G + rhs.G, lhs.B + rhs.B, 1.0f);
+        public static Color4 operator +(Color4 lhs, Color4 rhs) {
+            return new Color4(lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b, 1.0f);
         }
 
         #endregion

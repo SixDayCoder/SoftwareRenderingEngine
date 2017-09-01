@@ -45,6 +45,18 @@ namespace SoftwareRenderingEngine.RenderStruct {
             this.rhw = v.rhw;
         }
 
+        public override string ToString() {
+
+            string pos = string.Format("position : ({0}, {1}, {2}, {3})\n", position.x, position.y, position.z, position.w);
+            string uv = string.Format("uv : ({0}, {1})\n", u, v);
+            string rhw = string.Format("rhw : {0}\n", this.rhw);
+            string inz = string.Format("1/rhw : {0}\n", 1.0f / this.rhw);
+            string normal = string.Format("normal : ({0}, {1}, {2}, {3})\n", this.normal.x, this.normal.y, this.normal.z, this.normal.w);
+            string color = string.Format("color : [R : {0}, G : {1}, B : {2}, A : {3}]\n", this.color.R, this.color.G, this.color.B, this.color.A);
+
+            return pos + uv + rhw + inz + normal + color;
+        }
+
         #region static方法
 
         public static Vertex Lerp(Vertex min, Vertex max, float factor) {

@@ -184,12 +184,15 @@ namespace SoftwareRenderingEngine.Utility {
 
             for(float x = minx; x <= maxx; x += 1.0f) {
 
-                float factor = (x - minx) / (maxx - minx);
-                Vertex v = Vertex.Lerp(left, right, factor);
                 int xindex = MathUtility.RoundToInt(x);
 
-                //frameBuffer.SetPixel(xindex, yindex, v.color);
-                frameBuffer.SetPixel(xindex, yindex, Color.Red);
+                float factor = (x - minx) / (maxx - minx);
+
+                Vertex v = Vertex.Lerp(left, right, factor);
+                float w = 1.0f / v.rhw;
+                v.color *= w;
+
+                frameBuffer.SetPixel(xindex, yindex, v.color);
                 
             }
 
@@ -201,8 +204,6 @@ namespace SoftwareRenderingEngine.Utility {
 
             float miny = top.position.y;
             float maxy = bottomLeft.position.y;
-
-           
 
             for (float y = miny; y <= maxy; y += 1.0f) {
 

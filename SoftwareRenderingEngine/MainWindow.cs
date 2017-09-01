@@ -81,9 +81,9 @@ namespace SoftwareRenderingEngine {
             Mesh quad = new Mesh(Quad.positions, Quad.indices, Quad.colors);
             Mesh cube = new Mesh(Cube.positions, Cube.indices, Cube.colors);
 
-            //meshs.Add(primitive);
+            meshs.Add(primitive);
             //meshs.Add(quad);
-            meshs.Add(cube);
+            //meshs.Add(cube);
         }
 
         #endregion
@@ -129,7 +129,7 @@ namespace SoftwareRenderingEngine {
             //清空缓存
             for (int x = 0; x < buffer.Width; ++x) {
                 for (int y = 0; y < buffer.Height; ++y) {
-                    buffer.SetPixel(x, y, Color.Gray);
+                    buffer.SetPixel(x, y, Color.Black);
                 }
             }
 
@@ -147,11 +147,58 @@ namespace SoftwareRenderingEngine {
           
                 for (int i = 0; i < rows; ++i) {
 
+                    
                     Vertex p1 = new Vertex( mesh.vertices[ mesh.indices[i, 0] ] );
                     Vertex p2 = new Vertex( mesh.vertices[ mesh.indices[i, 1] ] );
                     Vertex p3 = new Vertex( mesh.vertices[ mesh.indices[i, 2] ] );
 
-                    RenderUtility.DrawTriangle(p1, p2, p3);
+                    
+                    Transform.TransformAll(ref p1, buffer.Width, buffer.Height);
+                    Transform.TransformAll(ref p2, buffer.Width, buffer.Height);
+                    Transform.TransformAll(ref p3, buffer.Width, buffer.Height);
+
+                    //p1(538, 508) bottom
+                    //p2(715, 406) middle
+                    //p3(630, 396) top
+
+                    Vertex top = p3;
+                    Vertex middle = p2;
+                    Vertex bottom = p1;
+
+                    float factor = (middle.position.y - top.position.y) / (bottom.position.y - top.position.y);
+                    //插值求新的middle
+                    Vertex newMiddle = Vertex.Lerp(top, bottom, factor);
+
+                    Vertex left;
+                    Vertex right;
+
+                    if (newMiddle.position.x < middle.position.x) {
+                        left = newMiddle;
+                        right = middle;
+                    }
+                    else {
+                        left = middle;
+                        right = newMiddle;
+                    }
+
+                    //bottom, top
+
+                    /*
+                    //通过这个例子发现,问题应该出在光栅化三角形的那三个函数 ? 
+                    //或者有可能是多次插值出现了问题,在这里写一个多次插值的例子
+                    int x = 300, y = 200;
+                    for(float t = 0.15f ; t <= 1.0f; t += 0.01f) {
+
+                        Vertex v = Vertex.Lerp(p1, p2, t);
+                        float w = 1.0f / v.rhw;
+                        v.color *= w;
+                        buffer.SetPixel(x, y, v.color);
+                        x++;
+                        y++;
+                    }
+                    */
+                    
+                    //RenderUtility.DrawTriangle(p1, p2, p3);
 
                 }
             }

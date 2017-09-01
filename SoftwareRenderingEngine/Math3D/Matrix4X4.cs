@@ -259,13 +259,13 @@ namespace SoftwareRenderingEngine.Math3D {
             Vector3 axisX = Vector3.Cross(camera.up, axisZ).Normalize();
             Vector3 axisY = Vector3.Cross(axisZ, axisX).Normalize();
 
-            Matrix4X4 view = new Matrix4X4(axisX.x, axisX.y, axisX.z, 0,
-                                           axisY.x, axisY.y, axisY.z, 0,
-                                           axisZ.x, axisZ.y, axisZ.z, 0,
-                                           0, 0, 0, 1);
-            view *= TranslateMatrix(-camera.pos.x, -camera.pos.y, -camera.pos.z);
+            Matrix4X4 rotation = new Matrix4X4(axisX.x, axisY.x, axisZ.x, 0,
+                                               axisX.y, axisY.y, axisZ.y, 0,
+                                               axisX.z, axisY.z, axisZ.z, 0,
+                                               0, 0, 0, 1);
+            Matrix4X4 trans =  TranslateMatrix(-camera.pos.x, -camera.pos.y, -camera.pos.z);
 
-            return view;
+            return rotation * trans;
 
         }
 
