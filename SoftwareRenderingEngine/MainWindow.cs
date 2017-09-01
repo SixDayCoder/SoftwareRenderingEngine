@@ -33,6 +33,8 @@ namespace SoftwareRenderingEngine {
         private Camera camera = null;
 
         private List<Mesh> meshs = null;
+
+        private RenderType renderType;
             
         #endregion
 
@@ -54,6 +56,12 @@ namespace SoftwareRenderingEngine {
             camera = new Camera(new Vector3(0, 0, 0, 1), new Vector3(0, 0, 1, 0), new Vector3(0, 1, 0, 0),
                                  3.1415926f / 4, this.Width / this.Height,
                                  1.0f, 500.0f);
+
+            //设定渲染的模式
+            renderType = RenderType.WireFrame;
+            renderType = RenderType.VertexColor;
+            RenderUtility.SetRenderType(renderType);
+
             //加载模型
             LoadMesh();
 
@@ -73,9 +81,9 @@ namespace SoftwareRenderingEngine {
             Mesh quad = new Mesh(Quad.positions, Quad.indices);
             Mesh cube = new Mesh(Cube.positions, Cube.indices);
 
-            //meshs.Add(primitive);
+            meshs.Add(primitive);
             //meshs.Add(quad);
-            meshs.Add(cube);
+            //meshs.Add(cube);
         }
 
         #endregion
@@ -92,7 +100,7 @@ namespace SoftwareRenderingEngine {
 
         #region 渲染流程
         //根据键盘的输入调整摄像机等,确定各个变换矩阵
-        private void UpdateTransform() {
+        private void ProcessInput() {
 
             #region 根据输入来设定模型的scale rotation translate矩阵
 
@@ -127,9 +135,6 @@ namespace SoftwareRenderingEngine {
 
             //清空zbuffer
             Array.Clear(zbuffer, 0, zbuffer.Length);
-
-            //清除整个绘图面并以黑色填充
-            //canvas.Clear(Color.Black);
         }
 
         //渲染Mesh网格
@@ -158,15 +163,17 @@ namespace SoftwareRenderingEngine {
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         private void Update(object sender, EventArgs e) {
 
-            //1.根据输入更新变换矩阵  UpdateTransform()
+            //1.根据输入更新变换矩阵  ProcessInput()
             //2.清除缓存             ClearBuffer()
             //3.开启渲染管线         RenderMesh()
             //4.屏幕绘制             canvas.DrawImage() 
             lock (buffer) {
-                UpdateTransform();
+
+                ProcessInput();
                 ClearBuffer();
                 RenderMesh();
                 canvas.DrawImage(buffer, 0, 0);
+
             }
 
         }

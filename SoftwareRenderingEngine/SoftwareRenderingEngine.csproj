@@ -60,7 +60,6 @@
     <Compile Include="RenderStruct\Mesh.cs" />
     <Compile Include="RenderStruct\RenderType.cs" />
     <Compile Include="RenderStruct\Transform.cs" />
-    <Compile Include="RenderStruct\Triangle.cs" />
     <Compile Include="RenderStruct\Vertex.cs" />
     <Compile Include="TestData\Cube.cs" />
     <Compile Include="TestData\Primitive.cs" />
