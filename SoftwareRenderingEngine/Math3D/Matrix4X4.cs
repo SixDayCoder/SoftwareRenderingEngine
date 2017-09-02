@@ -11,7 +11,7 @@ namespace SoftwareRenderingEngine.Math3D {
 
         #region 构造方法
 
-        private float[,] matrix = new float[4, 4];
+        public float[,] matrix = new float[4, 4];
 
         public float this[int i, int j] {
             get {
@@ -306,7 +306,7 @@ namespace SoftwareRenderingEngine.Math3D {
             return Determinate(matrix, 4);
         }
 
-        private float Determinate(float[,] m, int n)//递归求行列式
+        public float Determinate(float[,] m, int n)//递归求行列式
         {
             if (n == 1) {//递归出口
                 return m[0, 0];

@@ -11,7 +11,7 @@ using SoftwareRenderingEngine.Math3D;
 
 namespace SoftwareRenderingEngine.RenderStruct {
 
-    class Mesh {
+    public class Mesh {
 
 
         //顶点数组

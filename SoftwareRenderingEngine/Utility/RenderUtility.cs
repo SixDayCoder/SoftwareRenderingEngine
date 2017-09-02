@@ -13,9 +13,9 @@ namespace SoftwareRenderingEngine.Utility {
     public static class RenderUtility {
 
 
-        private static Bitmap frameBuffer;
+        public static Bitmap frameBuffer;
 
-        private static RenderType renderType;
+        public static RenderType renderType;
 
         public static void SetFrameBuffer(Bitmap buffer) {
             frameBuffer = buffer;
@@ -35,7 +35,7 @@ namespace SoftwareRenderingEngine.Utility {
         /// <param name="v2"></param>
         /// <param name="v3"></param>
         /// <returns>返回Vertex的数组,长度为3 result[0] = top, result[1] = middle, result[2] = bottom</returns>
-        private static Vertex[] RerangeVertex(Vertex v1, Vertex v2, Vertex v3) {
+        public static Vertex[] RerangeVertex(Vertex v1, Vertex v2, Vertex v3) {
 
             Vertex[] result = new Vertex[3];
 
@@ -97,14 +97,14 @@ namespace SoftwareRenderingEngine.Utility {
             return result;
         }
 
-        private static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
+        public static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref x1, ref x2);
             for (int x = x1; x <= x2; ++x)
                 frameBuffer.SetPixel(x, y1, Color.Red);
         }
 
-        private static void DrawVerticalLine(int x1, int y1, int x2, int y2) {
+        public static void DrawVerticalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref y1, ref y2);
 
@@ -113,7 +113,7 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
-        private static void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
+        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2) {
 
             //处理三两种特殊的情况
             if (x1 == x2 && y1 == y2) {
@@ -177,7 +177,7 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
-        private static void ScanlineFill(Vertex left, Vertex right, int yindex) {
+        public static void ScanlineFill(Vertex left, Vertex right, int yindex) {
 
             float minx = left.position.x;
             float maxx = right.position.x;
@@ -185,14 +185,13 @@ namespace SoftwareRenderingEngine.Utility {
             for(float x = minx; x <= maxx; x += 1.0f) {
 
                 int xindex = MathUtility.RoundToInt(x);
-
                 float factor = (x - minx) / (maxx - minx);
 
                 Vertex v = Vertex.Lerp(left, right, factor);
-                float w = 1.0f / v.rhw;
-                v.color *= w;
+                float w = 1/ v.rhw;
+                Color4 c = v.color * w;
 
-                frameBuffer.SetPixel(xindex, yindex, v.color);
+                frameBuffer.SetPixel(xindex, yindex, c);
                 
             }
 
@@ -200,12 +199,19 @@ namespace SoftwareRenderingEngine.Utility {
 
 
         //光栅化平底三角形
-        private static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
+        public static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
 
             float miny = top.position.y;
             float maxy = bottomLeft.position.y;
 
-            for (float y = miny; y <= maxy; y += 1.0f) {
+            //画顶点
+            int topx = MathUtility.RoundToInt(top.position.x);
+            int topy = MathUtility.RoundToInt(top.position.y);
+            float topw = 1 / top.rhw;
+            Color4 color = top.color * topw;
+            frameBuffer.SetPixel(topx, topy, color);
+
+            for (float y = miny + 1.0f ; y <= maxy; y += 1.0f) {
 
                 float factor = (y - miny) / (maxy - miny);
                 Vertex left = Vertex.Lerp(top, bottomLeft, factor);
@@ -219,12 +225,12 @@ namespace SoftwareRenderingEngine.Utility {
         }
 
         //光栅化平顶三角形
-        private static void RasterizationTriangleTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
+        public static void RasterizationTriangleTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
 
             float miny = topLeft.position.y;
             float maxy = bottom.position.y;
 
-            for(float y = miny; y <= maxy; y += 1.0f) {
+            for(float y = miny; y < maxy; y += 1.0f) {
 
                 float factor = (y - miny) / (maxy - miny);
                 Vertex left = Vertex.Lerp(topLeft, bottom, factor);
@@ -235,11 +241,18 @@ namespace SoftwareRenderingEngine.Utility {
 
             }
 
+            //画底点
+            int bottomx = MathUtility.RoundToInt(bottom.position.x);
+            int bottomy = MathUtility.RoundToInt(bottom.position.y);
+            float bottomw = 1 / bottom.rhw;
+            Color4 color = bottom.color * bottomw;
+            frameBuffer.SetPixel(bottomx, bottomy, color);
+
 
         }
 
         //光栅化三角形,任意一个三角形都可以被划分为平底三角形+平顶三角形
-        private static void RasterizationTriangle(Vertex v1, Vertex v2, Vertex v3) {
+        public static void RasterizationTriangle(Vertex v1, Vertex v2, Vertex v3) {
 
             Vertex[] sortedVertices = RerangeVertex(v1, v2, v3);
 
@@ -250,7 +263,6 @@ namespace SoftwareRenderingEngine.Utility {
             Vertex top = sortedVertices[0];
             Vertex middle = sortedVertices[1];
             Vertex bottom = sortedVertices[2];
-
 
             //平顶三角形
             if(top.position.y == middle.position.y) {

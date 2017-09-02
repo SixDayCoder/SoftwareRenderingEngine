@@ -24,17 +24,17 @@ namespace SoftwareRenderingEngine {
 
         #region 变量
 
-        private Graphics canvas = null;
+        public Graphics canvas = null;
 
-        private Bitmap buffer = null; 
+        public Bitmap buffer = null; 
 
-        private float[,] zbuffer = null;
+        public float[,] zbuffer = null;
 
-        private Camera camera = null;
+        public Camera camera = null;
 
-        private List<Mesh> meshs = null;
+        public List<Mesh> meshs = null;
 
-        private RenderType renderType;
+        public RenderType renderType;
             
         #endregion
 
@@ -71,7 +71,7 @@ namespace SoftwareRenderingEngine {
 
         #region  测试mesh,待改进
 
-        private void LoadMesh() {
+        public void LoadMesh() {
 
 
             //meshs,要渲染的网格列表
@@ -81,15 +81,15 @@ namespace SoftwareRenderingEngine {
             Mesh quad = new Mesh(Quad.positions, Quad.indices, Quad.colors);
             Mesh cube = new Mesh(Cube.positions, Cube.indices, Cube.colors);
 
-            meshs.Add(primitive);
+            //meshs.Add(primitive);
             //meshs.Add(quad);
-            //meshs.Add(cube);
+            meshs.Add(cube);
         }
 
         #endregion
 
         #region 开启计时器,设定FPS为60,每帧调用Update,在Update中进行渲染
-        private void SetupTimer() {
+        public void SetupTimer() {
             System.Timers.Timer timer = new System.Timers.Timer( 1000 / 60 );
             timer.Elapsed += new ElapsedEventHandler(Update);
             timer.AutoReset = true;
@@ -100,7 +100,7 @@ namespace SoftwareRenderingEngine {
 
         #region 渲染流程
         //根据键盘的输入调整摄像机等,确定各个变换矩阵
-        private void ProcessInput() {
+        public void ProcessInput() {
 
             #region 根据输入来设定模型的scale rotation translate矩阵
 
@@ -124,7 +124,7 @@ namespace SoftwareRenderingEngine {
         }
 
         //清空缓存 
-        private void ClearBuffer() {
+        public void ClearBuffer() {
 
             //清空缓存
             for (int x = 0; x < buffer.Width; ++x) {
@@ -138,7 +138,7 @@ namespace SoftwareRenderingEngine {
         }
 
         //渲染Mesh网格
-        private void RenderMesh() {
+        public void RenderMesh() {
 
             foreach(Mesh mesh in meshs) {
 
@@ -146,59 +146,12 @@ namespace SoftwareRenderingEngine {
                 int rows = mesh.indices.GetLength(0);
           
                 for (int i = 0; i < rows; ++i) {
-
-                    
+    
                     Vertex p1 = new Vertex( mesh.vertices[ mesh.indices[i, 0] ] );
                     Vertex p2 = new Vertex( mesh.vertices[ mesh.indices[i, 1] ] );
                     Vertex p3 = new Vertex( mesh.vertices[ mesh.indices[i, 2] ] );
 
-                    
-                    Transform.TransformAll(ref p1, buffer.Width, buffer.Height);
-                    Transform.TransformAll(ref p2, buffer.Width, buffer.Height);
-                    Transform.TransformAll(ref p3, buffer.Width, buffer.Height);
-
-                    //p1(538, 508) bottom
-                    //p2(715, 406) middle
-                    //p3(630, 396) top
-
-                    Vertex top = p3;
-                    Vertex middle = p2;
-                    Vertex bottom = p1;
-
-                    float factor = (middle.position.y - top.position.y) / (bottom.position.y - top.position.y);
-                    //插值求新的middle
-                    Vertex newMiddle = Vertex.Lerp(top, bottom, factor);
-
-                    Vertex left;
-                    Vertex right;
-
-                    if (newMiddle.position.x < middle.position.x) {
-                        left = newMiddle;
-                        right = middle;
-                    }
-                    else {
-                        left = middle;
-                        right = newMiddle;
-                    }
-
-                    //bottom, top
-
-                    /*
-                    //通过这个例子发现,问题应该出在光栅化三角形的那三个函数 ? 
-                    //或者有可能是多次插值出现了问题,在这里写一个多次插值的例子
-                    int x = 300, y = 200;
-                    for(float t = 0.15f ; t <= 1.0f; t += 0.01f) {
-
-                        Vertex v = Vertex.Lerp(p1, p2, t);
-                        float w = 1.0f / v.rhw;
-                        v.color *= w;
-                        buffer.SetPixel(x, y, v.color);
-                        x++;
-                        y++;
-                    }
-                    */
-                    
-                    //RenderUtility.DrawTriangle(p1, p2, p3);
+                    RenderUtility.DrawTriangle(p1, p2, p3);
 
                 }
             }
@@ -208,7 +161,7 @@ namespace SoftwareRenderingEngine {
         #endregion
 
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
-        private void Update(object sender, EventArgs e) {
+        public void Update(object sender, EventArgs e) {
 
             //1.根据输入更新变换矩阵  ProcessInput()
             //2.清除缓存             ClearBuffer()

@@ -11,10 +11,10 @@ namespace SoftwareRenderingEngine.Math3D {
 
     public class Color4 {
 
-        private float r;
-        private float g;
-        private float b;
-        private float a;
+        public float r;
+        public float g;
+        public float b;
+        public float a;
 
         public float R {
             get {
