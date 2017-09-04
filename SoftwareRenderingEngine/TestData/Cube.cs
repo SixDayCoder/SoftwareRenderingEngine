@@ -58,7 +58,7 @@ namespace SoftwareRenderingEngine.TestData {
             new Color4(Color.Red),
             new Color4(Color.Yellow),
             new Color4(Color.Blue),
-            new Color4(Color.Brown),
+            new Color4(Color.BlueViolet),
 
             new Color4(Color.Green),
             new Color4(Color.HotPink),

@@ -51,6 +51,7 @@ namespace SoftwareRenderingEngine {
 
             //根据buffer的大小设定zbuffer
             zbuffer = new float[this.Width, this.Height];
+            RenderUtility.SetZBuffer(zbuffer);
 
             //创建摄像机, 摄像机位置默认为(0,0,0),朝向z轴方向(0,0,1),以(0,1,0)为单位up向量,y方向的视角为90度,zn = 1, zf = 500
             camera = new Camera(new Vector3(0, 0, 0, 1), new Vector3(0, 0, 1, 0), new Vector3(0, 1, 0, 0),
@@ -163,10 +164,10 @@ namespace SoftwareRenderingEngine {
         //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
         public void Update(object sender, EventArgs e) {
 
-            //1.根据输入更新变换矩阵  ProcessInput()
-            //2.清除缓存             ClearBuffer()
-            //3.开启渲染管线         RenderMesh()
-            //4.屏幕绘制             canvas.DrawImage() 
+            //1.根据输入更新变换矩阵   ProcessInput()
+            //2.清除缓存              ClearBuffer()
+            //3.开启渲染管线          RenderMesh()
+            //4.屏幕绘制              canvas.DrawImage() 
             lock (buffer) {
 
                 ProcessInput();

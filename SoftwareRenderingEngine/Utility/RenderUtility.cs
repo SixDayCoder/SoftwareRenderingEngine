@@ -13,9 +13,11 @@ namespace SoftwareRenderingEngine.Utility {
     public static class RenderUtility {
 
 
-        public static Bitmap frameBuffer;
+        private static Bitmap frameBuffer;
 
-        public static RenderType renderType;
+        private static RenderType renderType;
+
+        private static float[,] zbuffer;
 
         public static void SetFrameBuffer(Bitmap buffer) {
             frameBuffer = buffer;
@@ -25,17 +27,17 @@ namespace SoftwareRenderingEngine.Utility {
             renderType = type;
         }
 
+        public static void SetZBuffer(float[,] buffer) {
+            zbuffer = buffer;
+        }
+
         /// <summary>
-        ///对三个顶点按照一定顺序排序
+        /// 排序顶点
         /// 1.top是y值最小的点(因为屏幕的y轴是向下的)
         /// 2.bottom是y值最大的点
         /// 3.middle是y值第二的点
         /// </summary>
-        /// <param name="v1"></param>
-        /// <param name="v2"></param>
-        /// <param name="v3"></param>
-        /// <returns>返回Vertex的数组,长度为3 result[0] = top, result[1] = middle, result[2] = bottom</returns>
-        public static Vertex[] RerangeVertex(Vertex v1, Vertex v2, Vertex v3) {
+        private static Vertex[] RerangeVertex(Vertex v1, Vertex v2, Vertex v3) {
 
             Vertex[] result = new Vertex[3];
 
@@ -97,14 +99,14 @@ namespace SoftwareRenderingEngine.Utility {
             return result;
         }
 
-        public static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
+        private static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref x1, ref x2);
             for (int x = x1; x <= x2; ++x)
                 frameBuffer.SetPixel(x, y1, Color.Red);
         }
 
-        public static void DrawVerticalLine(int x1, int y1, int x2, int y2) {
+        private static void DrawVerticalLine(int x1, int y1, int x2, int y2) {
 
             MathUtility.LhsLowerThanRhs(ref y1, ref y2);
 
@@ -132,6 +134,7 @@ namespace SoftwareRenderingEngine.Utility {
                 int x = 0, y = 0, error = 0;
                 int dx = (x1 < x2) ? x2 - x1 : x1 - x2;
                 int dy = (y1 < y2) ? y2 - y1 : y1 - y2;
+
 
                 //此时,斜率的绝对值小于1,说明x的变化快,为了不让画出的点稀疏,让x步进,计算y的值
                 if (dx >= dy) {
@@ -171,13 +174,13 @@ namespace SoftwareRenderingEngine.Utility {
                         }
                     }
 
-                    frameBuffer.SetPixel(x, y, Color.Red);
+                    frameBuffer.SetPixel(x2, y2, Color.Red);
                 }
             }
 
         }
 
-        public static void ScanlineFill(Vertex left, Vertex right, int yindex) {
+        private static void ScanlineFill(Vertex left, Vertex right, int yindex) {
 
             float minx = left.position.x;
             float maxx = right.position.x;
@@ -188,18 +191,25 @@ namespace SoftwareRenderingEngine.Utility {
                 float factor = (x - minx) / (maxx - minx);
 
                 Vertex v = Vertex.Lerp(left, right, factor);
-                float w = 1/ v.rhw;
-                Color4 c = v.color * w;
 
-                frameBuffer.SetPixel(xindex, yindex, c);
-                
+                //zbuffer test
+                //渲染z值比较小的点,忽略z值大的点,也就是渲染rhw比较大的点
+                if(v.rhw >= zbuffer[xindex, yindex]) {
+
+                    zbuffer[xindex, yindex] = v.rhw;
+                    float w = 1 / v.rhw;
+                    Color4 c = v.color * w;
+
+                    frameBuffer.SetPixel(xindex, yindex, c);
+
+                }                
             }
 
         }
 
 
         //光栅化平底三角形
-        public static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
+        private static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
 
             float miny = top.position.y;
             float maxy = bottomLeft.position.y;
@@ -225,7 +235,7 @@ namespace SoftwareRenderingEngine.Utility {
         }
 
         //光栅化平顶三角形
-        public static void RasterizationTriangleTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
+        private static void RasterizationTriangleTop(Vertex topLeft, Vertex topRight, Vertex bottom) {
 
             float miny = topLeft.position.y;
             float maxy = bottom.position.y;
