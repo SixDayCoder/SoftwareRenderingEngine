@@ -132,7 +132,6 @@ namespace SoftwareRenderingEngine.Math3D {
                                   0, 1, 0, 0,
                                   0, 0, 1, 0,
                                   x, y, z, 1 );
-
         }
 
         /// <summary>
@@ -232,10 +231,10 @@ namespace SoftwareRenderingEngine.Math3D {
         public static Matrix4X4 PerspectiveMatrix(float fovy, float aspect, float zn, float zf) {
 
             Matrix4X4 matrix = new Matrix4X4();
-            float tanHalfFov = (float)Math.Tan(fovy * 0.5f);
+            float tan = (float)Math.Tan(fovy * 0.5f);
 
-            matrix[0, 0] = 1 / ( tanHalfFov * aspect );
-            matrix[1, 1] = 1 / tanHalfFov;
+            matrix[0, 0] = 1 / ( tan * aspect );
+            matrix[1, 1] = 1 / tan;
             matrix[2, 2] = zf / (zf - zn);
             matrix[2, 3] = 1.0f;
             matrix[3, 2] = -(zn * zf) / (zf - zn);

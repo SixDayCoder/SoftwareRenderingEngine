@@ -67,6 +67,8 @@ namespace SoftwareRenderingEngine.TestData {
 
         };
 
+        //顶点法向量
+
     }
 
 }

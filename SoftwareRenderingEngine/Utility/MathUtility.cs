@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
+using SoftwareRenderingEngine.Math3D;
+
 namespace SoftwareRenderingEngine.Utility {
 
     public static class MathUtility {
@@ -91,6 +93,20 @@ namespace SoftwareRenderingEngine.Utility {
 
             return x;
 
+        }
+
+        /// <summary>
+        /// 根据入射向量和法线计算全反射向量
+        /// </summary>
+        /// <param name="inVector">入射向量</param>
+        /// <param name="normal">归一化的入射点法向量</param>
+        /// <returns></returns>
+        public static Vector3 ReflectVector(Vector3 inVector, Vector3 normal) {
+
+            Vector3 projection = Vector3.Dot(inVector, normal) * normal;
+            Vector3 refelct = inVector - 2.0f * projection;
+
+            return refelct;
         }
 
     }

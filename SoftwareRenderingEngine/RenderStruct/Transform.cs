@@ -40,7 +40,7 @@ namespace SoftwareRenderingEngine.RenderStruct {
             v.position = v.position * world;
 
             //顶点的世界空间法向量
-            //v.normal = (v.normal * world.Inverse().Transpose()).Normalize();
+            v.normal = (v.normal * world.Inverse().Transpose()).Normalize();
 
         }
 
@@ -52,8 +52,6 @@ namespace SoftwareRenderingEngine.RenderStruct {
         public static void TransformToView(ref Vertex v) {
  
             v.position = v.position * view;
-
-            //在相机空间下对三角面片做BackCulling
 
         }
 
@@ -100,42 +98,18 @@ namespace SoftwareRenderingEngine.RenderStruct {
 
                 //2.屏幕映射
                 //调整x,y到输出窗口 这里实际上也是利用了线性插值
-                //x[-1,1] -> x'[0,width]      (x'-0)/(width-0) = (x -(-1))/(1-(-1))  整理得  x' = (x + 1) * 0.5 * width
-                v.position.x = (v.position.x + 1) * 0.5f * width;
+                //x[-1,1] -> x'[0,width]      (x'-0)/(width-0) = (x -(-1))/(1-(-1))     整理得  x' = (x + 1) * 0.5 * width
+                v.position.x = (v.position.x + 1.0f) * 0.5f * width;
 
                 //y变换时需要特别注意,在屏幕上y是向下增长的,需要倒转y轴
                 //-y[-1,1] -> y'[0, height]     (y'-0)/(height-0) = (-y -(-1))/(1-(-1))  整理得  y' = (1 - y) * 0.5 * height
-                v.position.y = (1 - v.position.y) * 0.5f * height;
+                v.position.y = (1.0f - v.position.y) * 0.5f * height;
                 
             }
             else
                 return;
 
         }
-
-        /// <summary>
-        /// 将局部坐标系的点一次性变换到屏幕坐标
-        /// </summary>
-        /// <param name="v">局部坐标系下的点</param>
-        /// <param name="width">屏幕的宽度</param>
-        /// <param name="height">屏幕的高度</param>
-        public static void TransformAll (ref Vertex v, int width, int height) {
-
-            if (v != null) {
-
-                TransformToWorld(ref v);
-                TransformToView(ref v);
-                TransformToHomogeneous(ref v);
-                TransformToViewport(ref v, width, height);
-
-            }
-
-            //v为空引用
-            return;
-
-        }
-
-
         #endregion
 
     }

@@ -24,18 +24,21 @@ namespace SoftwareRenderingEngine {
 
         #region 变量
 
-        public Graphics canvas = null;
 
-        public Bitmap buffer = null; 
+        private Graphics canvas = null;
 
-        public float[,] zbuffer = null;
+        private Bitmap buffer = null; 
 
-        public Camera camera = null;
+        private float[,] zbuffer = null;
 
-        public List<Mesh> meshs = null;
+        private Light light;
 
-        public RenderType renderType;
-            
+        private Camera camera = null;
+
+        private List<Mesh> meshs = null;
+
+        private RenderType renderType;
+
         #endregion
 
         public MainWindow() {
@@ -53,8 +56,12 @@ namespace SoftwareRenderingEngine {
             zbuffer = new float[this.Width, this.Height];
             RenderUtility.SetZBuffer(zbuffer);
 
+            //创建平行光,平行光的位置默认为(0, 20, 0),光照颜色为橘黄色,环境光颜色为白色
+            light = new Light(new Vector3(0, 20, 0, 1), new Color4(Color.Orange), new Color4(Color.White));
+            RenderUtility.SetLight(light);
+
             //创建摄像机, 摄像机位置默认为(0,0,0),朝向z轴方向(0,0,1),以(0,1,0)为单位up向量,y方向的视角为90度,zn = 1, zf = 500
-            camera = new Camera(new Vector3(0, 0, 0, 1), new Vector3(0, 0, 1, 0), new Vector3(0, 1, 0, 0),
+            camera = new Camera( new Vector3(0, 0, 0, 1), new Vector3(0, 0, 1, 0), new Vector3(0, 1, 0, 0),
                                  3.1415926f / 4, this.Width / this.Height,
                                  1.0f, 500.0f);
 
@@ -64,30 +71,34 @@ namespace SoftwareRenderingEngine {
             RenderUtility.SetRenderType(renderType);
 
             //加载模型
-            LoadMesh();
+            //meshs,要渲染的网格列表
+            meshs = new List<Mesh>();
+
+            Mesh cube = new Mesh(Cube.positions, Cube.indices, Cube.colors);
+
+            meshs.Add(cube);
 
             //开启计时器
             SetupTimer();
         }
 
-        #region  测试mesh,待改进
+        //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
+        public void Update(object sender, EventArgs e) {
 
-        public void LoadMesh() {
+            //1.根据输入更新变换矩阵   ProcessInput()
+            //2.清除缓存              ClearBuffer()
+            //3.开启渲染管线          RenderMesh()
+            //4.屏幕绘制              canvas.DrawImage() 
+            lock (buffer) {
 
+                ProcessInput();
+                ClearBuffer();
+                RenderMesh();
+                canvas.DrawImage(buffer, 0, 0);
 
-            //meshs,要渲染的网格列表
-            meshs = new List<Mesh>();
+            }
 
-            Mesh primitive = new Mesh(Primitive.positions, Primitive.indices, Primitive.colors);
-            Mesh quad = new Mesh(Quad.positions, Quad.indices, Quad.colors);
-            Mesh cube = new Mesh(Cube.positions, Cube.indices, Cube.colors);
-
-            //meshs.Add(primitive);
-            //meshs.Add(quad);
-            meshs.Add(cube);
         }
-
-        #endregion
 
         #region 开启计时器,设定FPS为60,每帧调用Update,在Update中进行渲染
         public void SetupTimer() {
@@ -103,15 +114,10 @@ namespace SoftwareRenderingEngine {
         //根据键盘的输入调整摄像机等,确定各个变换矩阵
         public void ProcessInput() {
 
-            #region 根据输入来设定模型的scale rotation translate矩阵
-
-            //必须先缩放再旋转再平移
-
             Matrix4X4 scale = Matrix4X4.ScaleMatrix(1, 1, 1);
-            Matrix4X4 rotation = Matrix4X4.RotateMatrix(new Vector3(-1, -2, -3, 0), 3.1415926f / 4f);
+            Matrix4X4 rotation = Matrix4X4.RotateMatrix(new Vector3(-2, -2, -2, 0), 3.1415926f / 6.0f);
+            //Matrix4X4 rotation = Matrix4X4.Identity();
             Matrix4X4 translate = Matrix4X4.TranslateMatrix(0, 0, 10);
-
-            #endregion
 
             //1.设定world矩阵
             Transform.world = Matrix4X4.WorldMatrix(scale, rotation, translate);
@@ -143,11 +149,12 @@ namespace SoftwareRenderingEngine {
 
             foreach(Mesh mesh in meshs) {
 
-                //二维数组的行数
-                int rows = mesh.indices.GetLength(0);
+                
+                int triangles = mesh.indices.GetLength(0);
           
-                for (int i = 0; i < rows; ++i) {
-    
+                for (int i = 0; i < triangles; ++i) {
+                    
+                    //应当保证p1 p2 p3是逆时针的顺序 
                     Vertex p1 = new Vertex( mesh.vertices[ mesh.indices[i, 0] ] );
                     Vertex p2 = new Vertex( mesh.vertices[ mesh.indices[i, 1] ] );
                     Vertex p3 = new Vertex( mesh.vertices[ mesh.indices[i, 2] ] );
@@ -160,24 +167,6 @@ namespace SoftwareRenderingEngine {
         }
 
         #endregion
-
-        //在每一帧调用,通过在MainWindow的构造方法中设定定时器来启动Update
-        public void Update(object sender, EventArgs e) {
-
-            //1.根据输入更新变换矩阵   ProcessInput()
-            //2.清除缓存              ClearBuffer()
-            //3.开启渲染管线          RenderMesh()
-            //4.屏幕绘制              canvas.DrawImage() 
-            lock (buffer) {
-
-                ProcessInput();
-                ClearBuffer();
-                RenderMesh();
-                canvas.DrawImage(buffer, 0, 0);
-
-            }
-
-        }
 
     }
        

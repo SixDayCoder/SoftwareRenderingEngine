@@ -53,10 +53,10 @@
     <Compile Include="MainEntry.cs" />
     <Compile Include="Math3D\Color4.cs" />
     <Compile Include="Math3D\Matrix4X4.cs" />
-    <Compile Include="Math3D\Point2.cs" />
     <Compile Include="Math3D\Vector3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderStruct\Camera.cs" />
+    <Compile Include="RenderStruct\Light.cs" />
     <Compile Include="RenderStruct\Mesh.cs" />
     <Compile Include="RenderStruct\RenderType.cs" />
     <Compile Include="RenderStruct\Transform.cs" />

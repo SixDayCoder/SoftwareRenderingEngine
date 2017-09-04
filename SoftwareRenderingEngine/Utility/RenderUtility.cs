@@ -13,11 +13,17 @@ namespace SoftwareRenderingEngine.Utility {
     public static class RenderUtility {
 
 
-        private static Bitmap frameBuffer;
+        private static Light light = null;
 
-        private static RenderType renderType;
+        private static Bitmap frameBuffer = null;
 
-        private static float[,] zbuffer;
+        private static RenderType renderType = RenderType.WireFrame;
+
+        private static float[,] zbuffer = null;
+
+        public static void SetLight(Light l) {
+            light = l;
+        }
 
         public static void SetFrameBuffer(Bitmap buffer) {
             frameBuffer = buffer;
@@ -30,6 +36,7 @@ namespace SoftwareRenderingEngine.Utility {
         public static void SetZBuffer(float[,] buffer) {
             zbuffer = buffer;
         }
+
 
         /// <summary>
         /// 排序顶点
@@ -97,6 +104,31 @@ namespace SoftwareRenderingEngine.Utility {
             result[2] = bottom;
 
             return result;
+        }
+
+        private static bool BackFaceCulling(Vertex p1, Vertex p2, Vertex p3) {
+
+            if (renderType == RenderType.WireFrame)
+                return true;
+
+            Vector3 v1 = p2.position - p1.position;
+            Vector3 v2 = p3.position - p1.position;
+            Vector3 normal = Vector3.Cross(v1, v2);
+
+            //因为在相机空间下,相机的pos就是(0,0,0)
+            //视线向量选择三角面片上一点
+            Vector3 view1 = p1.position - new Vector3(0, 0, 0, 1);
+            Vector3 view2 = p2.position - new Vector3(0, 0, 0, 1);
+            Vector3 view3 = p3.position - new Vector3(0, 0, 0, 1);
+
+            if (Vector3.Dot(normal, view1) < 0 &&
+                Vector3.Dot(normal, view2) < 0 &&
+                Vector3.Dot(normal, view3) < 0)
+                return false;
+
+            return true;   
+            //return Vector3.Dot(normal, view) > 0;
+            
         }
 
         private static void DrawHrizontalLine(int x1, int y1, int x2, int y2) {
@@ -198,15 +230,19 @@ namespace SoftwareRenderingEngine.Utility {
 
                     zbuffer[xindex, yindex] = v.rhw;
                     float w = 1 / v.rhw;
-                    Color4 c = v.color * w;
 
-                    frameBuffer.SetPixel(xindex, yindex, c);
+                    //顶点颜色
+                    Color4 vertexColor = v.color * w;
+
+                    //光照颜色,view是随意给定的值,用于测试
+                    Color4 lightColor = light.Lighting(new Vector3(0, 0, 1, 0), v) * w;
+                   
+                    frameBuffer.SetPixel(xindex, yindex, vertexColor);
 
                 }                
             }
 
         }
-
 
         //光栅化平底三角形
         private static void RasterizationTriangleBottom(Vertex bottomLeft, Vertex bottomRight, Vertex top) {
@@ -321,17 +357,42 @@ namespace SoftwareRenderingEngine.Utility {
 
         }
 
+
         public static void DrawTriangle(Vertex p1, Vertex p2, Vertex p3) {
 
-            
+            #region 坐标变换 
+            /*===================1.世界空间======================*/
+            Transform.TransformToWorld(ref p1);
+            Transform.TransformToWorld(ref p2);
+            Transform.TransformToWorld(ref p3);
+            /*===================1.世界空间======================*/
 
-            Transform.TransformAll(ref p1, frameBuffer.Width, frameBuffer.Height);
-            Transform.TransformAll(ref p2, frameBuffer.Width, frameBuffer.Height);
-            Transform.TransformAll(ref p3, frameBuffer.Width, frameBuffer.Height);
+            /*===================2.相机空间======================*/
+            Transform.TransformToView(ref p1);
+            Transform.TransformToView(ref p2);
+            Transform.TransformToView(ref p3);
 
-            
+            if (BackFaceCulling(p1, p2, p3) == false)
+                return;
+            /*===================2.世界空间======================*/
+
+            /*=================3.齐次裁剪空间====================*/
+            Transform.TransformToHomogeneous(ref p1);
+            Transform.TransformToHomogeneous(ref p2);
+            Transform.TransformToHomogeneous(ref p3);
+            /*=================3.齐次裁剪空间====================*/
+
+
+            /*===================4.视口空间======================*/
+            Transform.TransformToViewport(ref p1, frameBuffer.Width, frameBuffer.Height);
+            Transform.TransformToViewport(ref p2, frameBuffer.Width, frameBuffer.Height);
+            Transform.TransformToViewport(ref p3, frameBuffer.Width, frameBuffer.Height);
+            /*===================4.视口空间======================*/
+
+            #endregion
+
             //线框模式
-            if(renderType == RenderType.WireFrame) {
+            if (renderType == RenderType.WireFrame) {
 
                 BresenhamDrawLine(MathUtility.RoundToInt(p1.position.x), MathUtility.RoundToInt(p1.position.y),
                                   MathUtility.RoundToInt(p2.position.x), MathUtility.RoundToInt(p2.position.y));
@@ -340,14 +401,13 @@ namespace SoftwareRenderingEngine.Utility {
                 BresenhamDrawLine(MathUtility.RoundToInt(p1.position.x), MathUtility.RoundToInt(p1.position.y),
                                   MathUtility.RoundToInt(p3.position.x), MathUtility.RoundToInt(p3.position.y));
             }
-            //光栅化模式
+            //光栅化
             else {
 
                 RasterizationTriangle(p1, p2, p3);
 
             }
             
-
         }
 
     }
