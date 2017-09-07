@@ -61,8 +61,9 @@ namespace SoftwareRenderingEngine {
             RenderUtility.SetLight(light);
 
             //创建摄像机, 摄像机位置默认为(0,0,0),朝向z轴方向(0,0,1),以(0,1,0)为单位up向量,y方向的视角为90度,zn = 1, zf = 500
+            float aspect = (float)this.Width / (float)this.Height;
             camera = new Camera( new Vector3(0, 0, 0, 1), new Vector3(0, 0, 1, 0), new Vector3(0, 1, 0, 0),
-                                 3.1415926f / 4, this.Width / this.Height,
+                                 3.1415926f / 4, aspect,
                                  1.0f, 500.0f);
 
             //设定渲染的模式
